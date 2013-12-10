@@ -1,0 +1,10 @@
+- XaML							-	Gui
+- DataBinding						-	Gui + CODE EVERYWHERE!
+- GPS en GeoFencing.					-	Model/Control
+- Bing maps of Google maps of Open Street Maps		-	Model/Control
+- Local/roaming storage					-	?(opslag positie speer, zodat iemand anders/ andere tablet hem kan ophalen.)
+- LINQ							-	xml highscores
+
+
+
+-WerpRichting 						->	Pushpin voor de richting op de kaart.
