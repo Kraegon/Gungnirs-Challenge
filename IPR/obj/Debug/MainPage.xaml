@@ -8,7 +8,23 @@
     mc:Ignorable="d">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="315*"/>
+            <ColumnDefinition Width="1051*"/>
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="91*"/>
+                    <RowDefinition Height="293*"/>
+                    <RowDefinition Height="180*"/>
+                    <RowDefinition Height="204*"/>
+                </Grid.RowDefinitions>
+                <TextBlock HorizontalAlignment="Left" Margin="85,40,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top"/>
+                <Image HorizontalAlignment="Left" Height="100" Margin="30,44,0,0" Grid.Row="3" VerticalAlignment="Top" Width="100" />
+                <Button Content="Button" HorizontalAlignment="Left" Margin="7,14,0,0" VerticalAlignment="Top" Height="59" Width="61" RenderTransformOrigin="0.147,0.308"/>
+            </Grid>
+        </Grid>
     </Grid>
 </Page>
 

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using IPR.Common;
+using IPR.Control;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -22,9 +24,27 @@ namespace IPR
     /// </summary>
     public sealed partial class MainPage : Page
     {
+        private NavigationHelper navigationHelper;
+        public NavigationHelper NavigationHelper
+        {
+            get { return this.navigationHelper; }
+        }       
+
         public MainPage()
         {
             this.InitializeComponent();
+            this.navigationHelper = new NavigationHelper(this);
+            BingMap.ZoomLevel = 9.0;
+            
+        }
+
+        public async void CenterPosition()
+        {
+            while(LocationService.INSTANCE.CurrentPosition == null)
+                
+            var location = new Bing.Maps.Location(LocationService.INSTANCE.CurrentPosition.Coordinate.Latitude,
+                                                   LocationService.INSTANCE.CurrentPosition.Coordinate.Longitude);
+            BingMap.SetView(location);
         }
     }
 }
