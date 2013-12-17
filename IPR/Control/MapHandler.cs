@@ -103,7 +103,7 @@ namespace IPR.Control
             DirManager.Waypoints = pointsCollection;
         }
 
-        private async void DrawRouteToSpear()
+        private async void DrawRouteToSpearAsync()
         {
             if (DirManager.Waypoints.Count > 1)
             {
@@ -118,8 +118,10 @@ namespace IPR.Control
                 manager.ShowRoutePath(manager.ActiveRoute);
             }
         }
-
-        private async void DrawThrownRoute()
+        /// <summary>
+        /// Draws A straight line from the player to the Spear the "Thrown line".
+        /// </summary>
+        private async void DrawThrownRouteAsync()
         {
 
             if (CurrentSpear.Avainable)
@@ -130,7 +132,7 @@ namespace IPR.Control
                 routeLine.Locations = new LocationCollection();
                 routeLine.Color = Windows.UI.Colors.Brown;
                 routeLine.Width = 5.0;
-                // Retrieve the route points that define the shape of the route.
+
                 routeLine.Locations.Add(new Location
                     {
                         Latitude = CurrentPlayer.Location.Latitude,
@@ -146,7 +148,10 @@ namespace IPR.Control
                 Map.ShapeLayers.Add(shapeLayer);
             }
             catch
-            { }
+            {
+                //Message dialog, description + Title
+                GodController.ShowMessageAsync("Something went wrong with drawing the route to the spear.", "Error");
+            }
         }
     }
 }
