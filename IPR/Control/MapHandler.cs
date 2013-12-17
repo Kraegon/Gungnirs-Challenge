@@ -103,6 +103,50 @@ namespace IPR.Control
             DirManager.Waypoints = pointsCollection;
         }
 
-        
+        private async void DrawRouteToSpear()
+        {
+            if (DirManager.Waypoints.Count > 1)
+            {
+                DirectionsManager manager = DirManager;
+                manager.Waypoints = DirManager.Waypoints;
+                RouteResponse response = await manager.CalculateDirectionsAsync();
+
+                manager.RequestOptions.RouteMode = RouteModeOption.Walking;
+                //not sure if usefull or not
+                //var distance = manager.RequestOptions.DistanceUnit;
+
+                manager.ShowRoutePath(manager.ActiveRoute);
+            }
+        }
+
+        private async void DrawThrownRoute()
+        {
+
+            if (CurrentSpear.Avainable)
+                return;
+            try
+            {
+                MapPolyline routeLine = new MapPolyline();
+                routeLine.Locations = new LocationCollection();
+                routeLine.Color = Windows.UI.Colors.Brown;
+                routeLine.Width = 5.0;
+                // Retrieve the route points that define the shape of the route.
+                routeLine.Locations.Add(new Location
+                    {
+                        Latitude = CurrentPlayer.Location.Latitude,
+                        Longitude = CurrentPlayer.Location.Longitude
+                    });
+                routeLine.Locations.Add(new Location
+                    {
+                        Latitude = CurrentSpear.Location.Latitude,
+                        Longitude = CurrentSpear.Location.Longitude
+                    });
+                MapShapeLayer shapeLayer = new MapShapeLayer();
+                shapeLayer.Shapes.Add(routeLine);
+                Map.ShapeLayers.Add(shapeLayer);
+            }
+            catch
+            { }
+        }
     }
 }
