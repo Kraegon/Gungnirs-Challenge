@@ -118,6 +118,7 @@ namespace IPR.Control
                 manager.ShowRoutePath(manager.ActiveRoute);
             }
         }
+
         /// <summary>
         /// Draws A straight line from the player to the Spear the "Thrown line".
         /// </summary>
