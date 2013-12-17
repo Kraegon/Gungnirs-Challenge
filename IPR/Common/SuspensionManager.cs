@@ -130,6 +130,8 @@ namespace IPR.Common
             }
         }
 
+
+
         private static DependencyProperty FrameSessionStateKeyProperty =
             DependencyProperty.RegisterAttached("_FrameSessionStateKey", typeof(String), typeof(SuspensionManager), null);
         private static DependencyProperty FrameSessionStateProperty =
@@ -242,6 +244,8 @@ namespace IPR.Common
             frameState["Navigation"] = frame.GetNavigationState();
         }
     }
+
+
     public class SuspensionManagerException : Exception
     {
         public SuspensionManagerException()

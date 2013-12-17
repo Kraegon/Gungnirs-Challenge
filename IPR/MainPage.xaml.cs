@@ -14,6 +14,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using Bing.Maps;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -40,11 +41,12 @@ namespace IPR
 
         public async void CenterPosition()
         {
-            while(LocationService.INSTANCE.CurrentPosition == null)
-                
-            var location = new Bing.Maps.Location(LocationService.INSTANCE.CurrentPosition.Coordinate.Latitude,
-                                                   LocationService.INSTANCE.CurrentPosition.Coordinate.Longitude);
-            BingMap.SetView(location);
+            while (LocationService.INSTANCE.CurrentPosition == null)
+            {
+                var location = new Bing.Maps.Location(LocationService.INSTANCE.CurrentPosition.Coordinate.Latitude,
+                                                       LocationService.INSTANCE.CurrentPosition.Coordinate.Longitude);
+                BingMap.SetView(location);
+            }
         }
     }
 }
