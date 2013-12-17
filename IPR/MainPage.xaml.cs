@@ -15,6 +15,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using Bing.Maps;
+using IPR.Control;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -36,6 +37,13 @@ namespace IPR
             this.InitializeComponent();
             this.navigationHelper = new NavigationHelper(this);
             BingMap.ZoomLevel = 9.0;
+
+
+           
+
+            /* Initalizes the controllers and adds the map to the maphandler */
+            GodController.Initialize();
+            GodController.GetMapHandler().SetMap(BingMap);
         }
 
         public async void CenterPosition()

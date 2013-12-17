@@ -13,8 +13,7 @@ namespace IPR.Control
         /// <summary>
         /// The map will be stored here
         /// </summary>
-        private Map Map { get; public set; }
-
+        private Map Map;
         /// <summary>
         /// Collection of waypoints (Player and Spear)
         /// </summary>
