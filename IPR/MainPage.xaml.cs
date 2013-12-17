@@ -35,15 +35,10 @@ namespace IPR
         public MainPage()
         {
             this.InitializeComponent();
-            this.navigationHelper = new NavigationHelper(this);
-            BingMap.ZoomLevel = 9.0;
-
-
-           
 
             /* Initalizes the controllers and adds the map to the maphandler */
-            GodController.Initialize();
             GodController.GetMapHandler().SetMap(BingMap);
+            GodController.GetMapHandler().Initialize();
         }
 
         public async void CenterPosition()
@@ -54,6 +49,24 @@ namespace IPR
                                                        LocationService.INSTANCE.CurrentPosition.Coordinate.Longitude);
                 BingMap.SetView(location);
             }
+        }
+
+        public Map GetMapObject()
+        {
+            return BingMap;
+        }
+
+        public void DrawCurrentLocation(Location loc)
+        {
+            BingMap.SetView(loc, 9.0f);
+
+            Pushpin pin = new Pushpin()
+            {
+                Text = "Me"
+            };
+
+            BingMap.Children.Add(pin);
+            MapLayer.SetPosition(pin, loc);
         }
     }
 }

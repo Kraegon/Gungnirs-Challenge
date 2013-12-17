@@ -72,13 +72,10 @@ namespace IPR
 
                 // Place the frame in the current Window
                 Window.Current.Content = rootFrame;
-            }
 
-            if (rootFrame.Content == null)
-            {
-                // When the navigation stack isn't restored navigate to the first page,
-                // configuring the new page by passing required information as a navigation
-                // parameter
+                //  initialize the GodController  //
+                GodController.Initialize();
+
                 rootFrame.Navigate(typeof(MainPage), e.Arguments);
             }
             // Ensure the current window is active
