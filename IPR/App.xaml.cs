@@ -14,6 +14,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using IPR.Control;
 
 // The Blank Application template is documented at http://go.microsoft.com/fwlink/?LinkId=234227
 
@@ -24,6 +25,8 @@ namespace IPR
     /// </summary>
     sealed partial class App : Application
     {
+        private static MapHandler HandleMap;
+
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
@@ -105,5 +108,6 @@ namespace IPR
             //TODO: Save application state and stop any background activity
             deferral.Complete();
         }
+
     }
 }

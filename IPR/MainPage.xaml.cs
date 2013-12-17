@@ -36,7 +36,6 @@ namespace IPR
             this.InitializeComponent();
             this.navigationHelper = new NavigationHelper(this);
             BingMap.ZoomLevel = 9.0;
-            
         }
 
         public async void CenterPosition()
