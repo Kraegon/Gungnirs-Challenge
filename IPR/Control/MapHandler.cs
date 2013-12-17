@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Bing.Maps;
 using Bing.Maps.Directions;
 using IPR.Model;
+using Windows.UI.Xaml.Controls.Image;
 
 namespace IPR.Control
 {
@@ -26,12 +27,12 @@ namespace IPR.Control
         private DirectionsManager DirManager;
 
         /// <summary>
-        /// Active spear
+        /// The current active spear
         /// </summary>
         private Spear CurrentSpear;
 
         /// <summary>
-        /// 
+        /// The current active player
         /// </summary>
         private Player CurrentPlayer;
 
@@ -51,6 +52,7 @@ namespace IPR.Control
                 {
                     Name = "Jelle"
                 };
+            WaypointCol = new WaypointCollection();
         }
 
         public void SetMap(Map map)
@@ -68,11 +70,39 @@ namespace IPR.Control
         /// </summary>
         private void AddPinsAndPoints()
         {
-            Waypoint playerPoint;
-            Waypoint spearPoint;
+            // WaypointsCollection needs to be cleared to get accurate data.
+            WaypointCol.Clear();
+
+            //Order in which they are added is important!
+            //First the player then the spear.
+
+            //PlayerStuff
+            WaypointCol.Add(new Waypoint(CurrentPlayer.Location));
+            Pushpin PlayerPin = new Pushpin() { Name = CurrentPlayer.Name };
+            Map.Children.Add(PlayerPin);
+            Map.Children.Add(PlayerPin);
+            MapLayer.SetPosition(PlayerPin, CurrentPlayer.Location);
+
+            // Spear Stuff
+            Pushpin SpearPin;
             if (!CurrentSpear.Avainable)
-                spearPoint = new Waypoint(CurrentSpear.Location);
-            playerPoint = new Waypoint(CurrentPlayer.Location);
+            {
+                WaypointCol.Add(new Waypoint(CurrentSpear.Location));
+                SpearPin = new Pushpin();
+                Map.Children.Add(SpearPin);
+                MapLayer.SetPosition(SpearPin, CurrentSpear.Location);
+            }
         }
+
+        /// <summary>
+        /// makes a list of waypoints in the directionsmanager
+        /// </summary>
+        /// <param name="pointsCollection"></param>
+        private void AddWaypointsToDirectionsManager(WaypointCollection pointsCollection)
+        {
+            DirManager.Waypoints = pointsCollection;
+        }
+
+        
     }
 }

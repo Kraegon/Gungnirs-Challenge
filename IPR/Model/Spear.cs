@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Bing.Maps;
+using Windows.UI.Xaml.Controls;
+
 
 namespace IPR.Model
 {
@@ -24,7 +26,9 @@ namespace IPR.Model
         /// </summary>
         public Location Location { get; set; }
 
-        ///TODO: 
-        ///add a BitmapImage
+        /// <summary>
+        /// The current image of the spear
+        /// </summary>
+        public Image Image { get; set; }
     }
 }
