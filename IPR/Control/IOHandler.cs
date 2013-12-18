@@ -5,14 +5,27 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows;
 using System.Xml.Linq;
-using 
+ 
 
 namespace IPR.Control
 {
-    
-
     class IOHandler
     {
-        StorageFile
+        public XElement XMLTree;
+
+        public IOHandler()
+        {
+
+        }
+
+        /// <summary>
+        /// Initializes the current XML list
+        /// Still work in progress
+        /// </summary>
+        public void Initialize()
+        {
+            //TODO: Implement a way to read from a xml file
+            XMLTree = new XElement("Root", new XElement("Highscore", "Jelle" + " Score"));
+        }
     }
 }

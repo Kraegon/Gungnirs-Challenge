@@ -50,7 +50,9 @@ namespace IPR.Control
                 };
             CurrentPlayer = new Player()
                 {
-                    Name = "Jelle"
+                    Name = "Jelle",
+                    //TODO: Location From Geolocation to location.
+ //                   Location = LocationService.INSTANCE.CurrentPosition
                 };
             WaypointCol = new WaypointCollection();
         }
