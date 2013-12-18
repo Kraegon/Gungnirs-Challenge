@@ -25,7 +25,7 @@ namespace IPR.Control
         public void Initialize()
         {
             //TODO: Implement a way to read from a xml file
-            XMLTree = new XElement("Root", new XElement("Highscore", "Jelle" + " Score"));
+            XMLTree = new XElement("Player", new XElement("Score", 10));
         }
     }
 }

@@ -25,10 +25,10 @@ namespace IPR.Control
         {
             Locator = new Geolocator();
             Locator.DesiredAccuracy = PositionAccuracy.High;
-            FindCurrentPositionAsync();
+            FindCurrentPosition();
         }
 
-        public async void FindCurrentPositionAsync()
+        public async void FindCurrentPosition()
         {
             CurrentPosition = await Locator.GetGeopositionAsync();
         }

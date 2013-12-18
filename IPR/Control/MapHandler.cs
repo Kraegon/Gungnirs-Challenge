@@ -61,6 +61,7 @@ namespace IPR.Control
                     Name = "Jelle",
                 };
             WaypointCol = new WaypointCollection();
+            GetCurrentLocationAsync();
         }
 
         private async Task GetCurrentLocationAsync()
@@ -75,15 +76,14 @@ namespace IPR.Control
             }
             catch (UnauthorizedAccessException)
             {
-                GodController.ShowMessageAsync("No acces to gps location" + "/n" + "Please make sure you enabled access to your location", "Error");
+                GodController.ShowMessage("No acces to gps location" + "/n" + "Please make sure you enabled access to your location", "Error");
             }
             catch(TaskCanceledException)
             {
-                GodController.ShowMessageAsync("Task is canceled, /n Please try to restart", "Task canceled")
+                GodController.ShowMessage("Task is canceled, /n Please try to restart", "Task canceled");
             }
             finally
-            {
-                
+            {   
                 Cts = null;
             }
         }
@@ -144,7 +144,7 @@ namespace IPR.Control
             DirManager.Waypoints = pointsCollection;
         }
 
-        private async void DrawRouteToSpearAsync()
+        private async void DrawRouteToSpear()
         {
             if (DirManager.Waypoints.Count > 1)
             {
@@ -163,7 +163,7 @@ namespace IPR.Control
         /// <summary>
         /// Draws A straight line from the player to the Spear the "Thrown line".
         /// </summary>
-        private async void DrawThrownRouteAsync()
+        private async void DrawThrownRoute()
         {
 
             if (CurrentSpear.Avainable)
@@ -192,7 +192,7 @@ namespace IPR.Control
             catch
             {
                 //Message dialog, description + Title
-                GodController.ShowMessageAsync("Something went wrong with drawing the route to the spear.", "Error");
+                GodController.ShowMessage("Something went wrong with drawing the route to the spear.", "Error");
             }
         }
     }

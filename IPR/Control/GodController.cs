@@ -25,7 +25,7 @@ namespace IPR.Control
             return HandleMap;
         }
 
-        public static async void ShowMessageAsync(string title, string description)
+        public static async void ShowMessage(string title, string description)
         {
             var MessageDialog = new MessageDialog(description, title);
             await MessageDialog.ShowAsync();
