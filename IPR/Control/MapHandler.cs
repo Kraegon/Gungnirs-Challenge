@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Bing.Maps;
 using Bing.Maps.Directions;
-using IPR.Model;
 using Windows.UI.Xaml.Controls.Image;
+using Windows.Devices.Geolocation;
+using IPR.Model;
 
 namespace IPR.Control
 {
@@ -36,6 +38,9 @@ namespace IPR.Control
         /// </summary>
         private Player CurrentPlayer;
 
+        private Geolocator Locator;
+        private CancellationTokenSource Cts;
+
         public MapHandler()
         {
             
@@ -48,20 +53,54 @@ namespace IPR.Control
                     Avainable = true,
                     Weight = 10
                 };
+
+            var temp = GetCurrentLocationAsync();
+
             CurrentPlayer = new Player()
                 {
                     Name = "Jelle",
-                    //TODO: Location From Geolocation to location.
- //                   Location = LocationService.INSTANCE.CurrentPosition
                 };
             WaypointCol = new WaypointCollection();
         }
 
+        private async Task GetCurrentLocationAsync()
+        {
+            Geoposition pos;
+            try
+            {
+                Locator = new Geolocator();
+                Cts = new CancellationTokenSource();
+                pos = await Locator.GetGeopositionAsync().AsTask(Cts.Token);
+                CurrentPlayer.Location = new Location(pos.Coordinate.Latitude, pos.Coordinate.Longitude);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                GodController.ShowMessageAsync("No acces to gps location" + "/n" + "Please make sure you enabled access to your location", "Error");
+            }
+            catch(TaskCanceledException)
+            {
+                GodController.ShowMessageAsync("Task is canceled, /n Please try to restart", "Task canceled")
+            }
+            finally
+            {
+                
+                Cts = null;
+            }
+        }
+
+        /// <summary>
+        /// Sets the map, Importent to not change, used once not necessary afterwards
+        /// </summary>
+        /// <param name="map"></param>
         public void SetMap(Map map)
         {
             this.Map = map;
         }
 
+        /// <summary>
+        /// Sets the current player
+        /// </summary>
+        /// <param name="player"></param>
         public void SetPlayer(Player player)
         {
             this.CurrentPlayer = player;
