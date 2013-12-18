@@ -19,6 +19,9 @@ namespace IPR.Model
         /// </summary>
         public Location Location { get; set; }
 
-
+        /// <summary>
+        /// The Score the player gets by throwing the spear.
+        /// </summary>
+        public double Score { get; set; }
     }
 }
