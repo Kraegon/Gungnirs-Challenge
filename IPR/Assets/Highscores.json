@@ -1,0 +1,14 @@
+﻿{
+	"highscores": {
+		"1": {
+			"Name": "AAA",
+			"Distance": "1000",
+			"TimeTaken": "10:00",
+		}
+		"2": {
+			"Name": "BBB",
+			"Distance": "999",
+			"TimeTaken": "9:00",
+		}
+	}
+}
