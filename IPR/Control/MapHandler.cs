@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Bing.Maps;
 using Bing.Maps.Directions;
-using Windows.UI.Xaml.Controls.Image;
+//using Windows.UI.Xaml.Controls.Image;
 using Windows.Devices.Geolocation;
 using IPR.Model;
 
@@ -39,29 +39,25 @@ namespace IPR.Control
         private Player CurrentPlayer;
 
         private Geolocator Locator;
-        private CancellationTokenSource Cts;
 
         public MapHandler()
         {
-            
         }
 
-        public void Initialize()
+        public async void Initialize()
         {
             CurrentSpear = new Spear()
                 {
-                    Avainable = true,
+                    Available = true,
                     Weight = 10
                 };
-
-            var temp = GetCurrentLocationAsync();
 
             CurrentPlayer = new Player()
                 {
                     Name = "Jelle",
                 };
             WaypointCol = new WaypointCollection();
-            GetCurrentLocationAsync();
+            await GetCurrentLocationAsync();
         }
 
         private async Task GetCurrentLocationAsync()
@@ -70,8 +66,7 @@ namespace IPR.Control
             try
             {
                 Locator = new Geolocator();
-                Cts = new CancellationTokenSource();
-                pos = await Locator.GetGeopositionAsync().AsTask(Cts.Token);
+                pos = await Locator.GetGeopositionAsync();
                 CurrentPlayer.Location = new Location(pos.Coordinate.Latitude, pos.Coordinate.Longitude);
             }
             catch (UnauthorizedAccessException)
@@ -80,11 +75,7 @@ namespace IPR.Control
             }
             catch(TaskCanceledException)
             {
-                GodController.ShowMessage("Task is canceled, /n Please try to restart", "Task canceled");
-            }
-            finally
-            {   
-                Cts = null;
+                GodController.ShowMessage("Task is canceled," + "/n" + "Please try to restart", "Task canceled");
             }
         }
 
@@ -95,6 +86,8 @@ namespace IPR.Control
         public void SetMap(Map map)
         {
             this.Map = map;
+            Map.DoubleTapped += Map_DoubleTapped;
+
         }
 
         /// <summary>
@@ -126,7 +119,7 @@ namespace IPR.Control
 
             // Spear Stuff
             Pushpin SpearPin;
-            if (!CurrentSpear.Avainable)
+            if (!CurrentSpear.Available)
             {
                 WaypointCol.Add(new Waypoint(CurrentSpear.Location));
                 SpearPin = new Pushpin();
@@ -166,7 +159,7 @@ namespace IPR.Control
         private async void DrawThrownRoute()
         {
 
-            if (CurrentSpear.Avainable)
+            if (CurrentSpear.Available)
                 return;
             try
             {
@@ -195,5 +188,22 @@ namespace IPR.Control
                 GodController.ShowMessage("Something went wrong with drawing the route to the spear.", "Error");
             }
         }
+
+        void Map_DoubleTapped(object sender, Windows.UI.Xaml.Input.DoubleTappedRoutedEventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine("Event double tapped worked");
+
+            var position = e.GetPosition(Map);
+           
+            Location loc = new Location(position.X, position.Y);
+            
+            Pushpin pin = new Pushpin
+            {
+                Name = "Direction_Pin"
+            };
+
+            MapLayer.SetPosition(pin, loc);
+
+        }    
     }
 }

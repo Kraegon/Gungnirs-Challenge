@@ -68,5 +68,15 @@ namespace IPR
             BingMap.Children.Add(pin);
             MapLayer.SetPosition(pin, loc);
         }
+
+        async private void MapTabEvent(object sender, RoutedEventArgs e)
+        {
+            if (BingMap.Children.Count > 1)
+            {
+                //Bigger then one, First child is the player.
+                BingMap.Children.RemoveAt(1);
+            }
+            
+        }
     }
 }

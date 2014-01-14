@@ -19,7 +19,7 @@ namespace IPR.Model
         /// <summary>
         /// Checks if the spear is avainable for usage
         /// </summary>
-        public bool Avainable { get; set; }
+        public bool Available { get; set; }
 
         /// <summary>
         /// The current location of the spear
