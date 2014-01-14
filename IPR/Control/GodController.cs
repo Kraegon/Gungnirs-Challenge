@@ -30,5 +30,11 @@ namespace IPR.Control
             var MessageDialog = new MessageDialog(description, title);
             await MessageDialog.ShowAsync();
         }
+
+        public static async Task ShowMessageAsync(string title, string description)
+        {
+            var MessageDialog = new MessageDialog(description, title);
+            await MessageDialog.ShowAsync();
+        }
     }
 }
