@@ -182,13 +182,14 @@ namespace IPR.Control
         }
 
 
-        //TODO: Fix DoubleTappedEvent
         void Map_DoubleTapped(object sender, Windows.UI.Xaml.Input.DoubleTappedRoutedEventArgs e)
         {
             var position = e.GetPosition(Map);
-
             Location loc;
             Map.TryPixelToLocation(position, out loc);
+
+            System.Diagnostics.Debug.WriteLine(MathCalculation.CalculateAngle(GodController.CurrentPlayer.Location, loc ).ToString());
+
 
             DirectionLocation = loc;
         }

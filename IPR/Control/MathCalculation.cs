@@ -13,15 +13,22 @@ namespace IPR.Control
         public static double CalculateAngle(Location location, Location directionPoint)
         {
             double dLongitude = (directionPoint.Longitude - location.Longitude);
+            double dLatitude = (directionPoint.Latitude - location.Latitude);
+
+//            hoek = o/a 
+
 
             double y = Math.Sin(dLongitude) * Math.Cos(directionPoint.Latitude);
             double x = Math.Cos(location.Latitude) * Math.Sin(directionPoint.Latitude - Math.Sin(location.Latitude * Math.Cos(directionPoint.Latitude * Math.Cos(dLongitude))));
 
             double angle = Math.Atan2(y, x);
+            angle = (angle / Math.PI) * 180;
+            angle = (angle + 360) % 360;
+            angle = 360 - angle;
 
-
-
-            return 10.0;
+            return angle;
         }
+
+
     }
 }
