@@ -86,7 +86,7 @@ namespace IPR.Control
         public void SetMap(Map map)
         {
             this.Map = map;
-            Map.DoubleTapped += Map_DoubleTapped;
+            Map.DoubleTappedOverride += Map_DoubleTapped;
 
         }
 
@@ -189,9 +189,18 @@ namespace IPR.Control
             }
         }
 
+
+
+
+        //TODO: Fix DoubleTappedEvent
         void Map_DoubleTapped(object sender, Windows.UI.Xaml.Input.DoubleTappedRoutedEventArgs e)
         {
             System.Diagnostics.Debug.WriteLine("Event double tapped worked");
+
+            if (Map.Children.Count > 1)
+            {
+                Map.Children.Clear();
+            }
 
             var position = e.GetPosition(Map);
            
@@ -203,7 +212,7 @@ namespace IPR.Control
             };
 
             MapLayer.SetPosition(pin, loc);
-
-        }    
+            Map.Children.Add(pin);
+        }
     }
 }
