@@ -202,7 +202,6 @@ namespace IPR.Control
         //TODO: Fix DoubleTappedEvent
         void Map_DoubleTapped(object sender, Windows.UI.Xaml.Input.DoubleTappedRoutedEventArgs e)
         {
-
             if (Map.Children.Count > 0)
             {
                 Map.Children.Clear();
