@@ -4,25 +4,30 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.UI.Popups;
+using IPR.Model;
 
 namespace IPR.Control
 {
     class GodController
     {
-        private static MapHandler HandleMap;
-        private static LocationService ServiceLocation;
+        /// <summary>
+        /// The current active spear
+        /// </summary>
+        public static Spear CurrentSpear { get; set; }
 
         /// <summary>
-        /// Initializes the project
+        /// The current active player
         /// </summary>
-        public static void Initialize()
+        public static Player CurrentPlayer { get; set; }
+        private static MapHandler handleMap;
+        public static MapHandler HandleMap
         {
-            HandleMap = new MapHandler();
-        }
-
-        public static MapHandler GetMapHandler()
-        {
-            return HandleMap;
+            get
+            {
+                if (handleMap == null)
+                    handleMap = new MapHandler();
+                return handleMap;
+            }
         }
 
         public static async void ShowMessage(string title, string description)

@@ -9,6 +9,8 @@ using Bing.Maps.Directions;
 //using Windows.UI.Xaml.Controls.Image;
 using Windows.Devices.Geolocation;
 using IPR.Model;
+using Windows.UI.Core;
+using Windows.UI.Xaml;
 
 namespace IPR.Control
 {
@@ -27,56 +29,31 @@ namespace IPR.Control
         /// Navigates between the waypoints
         /// </summary>
         private DirectionsManager DirManager;
-
-        /// <summary>
-        /// The current active spear
-        /// </summary>
-        private Spear CurrentSpear;
-
-        /// <summary>
-        /// The current active player
-        /// </summary>
-        private Player CurrentPlayer;
-
-        private Geolocator Locator;
+        public Location DirectionLocation;
+        public Geolocator Locator;
 
         public MapHandler()
         {
         }
 
-        public async void Initialize()
+        public void Initialize()
         {
-            CurrentSpear = new Spear()
-                {
-                    Available = true,
-                    Weight = 10
-                };
-
-            CurrentPlayer = new Player()
-                {
-                    Name = "Jelle",
-                };
+            Locator = new Geolocator();
             WaypointCol = new WaypointCollection();
-            await GetCurrentLocationAsync();
+            Locator.DesiredAccuracy = PositionAccuracy.High;
+            Locator.PositionChanged += Locator_PositionChanged;
         }
 
-        private async Task GetCurrentLocationAsync()
+        private async void Locator_PositionChanged(Geolocator sender, PositionChangedEventArgs e)
         {
-            Geoposition pos;
-            try
+            await MainPage.dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
-                Locator = new Geolocator();
-                pos = await Locator.GetGeopositionAsync();
-                CurrentPlayer.Location = new Location(pos.Coordinate.Latitude, pos.Coordinate.Longitude);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                GodController.ShowMessage("No acces to gps location" + "/n" + "Please make sure you enabled access to your location", "Error");
-            }
-            catch(TaskCanceledException)
-            {
-                GodController.ShowMessage("Task is canceled," + "/n" + "Please try to restart", "Task canceled");
-            }
+                if (GodController.CurrentPlayer == null)
+                    //return;
+                    GodController.CurrentPlayer = new Player();
+                GodController.CurrentPlayer.Location = new Location(e.Position.Coordinate.Point.Position.Latitude,
+                                                      e.Position.Coordinate.Point.Position.Longitude);
+            });
         }
 
         /// <summary>
@@ -96,7 +73,7 @@ namespace IPR.Control
         /// <param name="player"></param>
         public void SetPlayer(Player player)
         {
-            this.CurrentPlayer = player;
+            GodController.CurrentPlayer = player;
         }
 
         /// <summary>
@@ -111,20 +88,20 @@ namespace IPR.Control
             //First the player then the spear.
 
             //PlayerStuff
-            WaypointCol.Add(new Waypoint(CurrentPlayer.Location));
-            Pushpin PlayerPin = new Pushpin() { Name = CurrentPlayer.Name };
+            WaypointCol.Add(new Waypoint(GodController.CurrentPlayer.Location));
+            Pushpin PlayerPin = new Pushpin() { Name = GodController.CurrentPlayer.Name };
             Map.Children.Add(PlayerPin);
             Map.Children.Add(PlayerPin);
-            MapLayer.SetPosition(PlayerPin, CurrentPlayer.Location);
+            MapLayer.SetPosition(PlayerPin, GodController.CurrentPlayer.Location);
 
             // Spear Stuff
             Pushpin SpearPin;
-            if (!CurrentSpear.Available)
+            if (!GodController.CurrentSpear.Available)
             {
-                WaypointCol.Add(new Waypoint(CurrentSpear.Location));
+                WaypointCol.Add(new Waypoint(GodController.CurrentSpear.Location));
                 SpearPin = new Pushpin();
                 Map.Children.Add(SpearPin);
-                MapLayer.SetPosition(SpearPin, CurrentSpear.Location);
+                MapLayer.SetPosition(SpearPin, GodController.CurrentSpear.Location);
             }
         }
 
@@ -142,7 +119,7 @@ namespace IPR.Control
         /// </summary>
         private async void DrawRouteToSpear()
         {
-            if (CurrentSpear.Available)
+            if (GodController.CurrentSpear.Available)
                 return;
 
             if (DirManager.Waypoints.Count > 1)
@@ -163,10 +140,10 @@ namespace IPR.Control
         /// <summary>
         /// Draws A straight line from the player to the Spear the "Thrown line".
         /// </summary>
-        private async void DrawThrownRoute()
+        private void DrawThrownRoute()
         {
 
-            if (CurrentSpear.Available)
+            if (GodController.CurrentSpear.Available)
                 return;
             try
             {
@@ -177,13 +154,13 @@ namespace IPR.Control
 
                 routeLine.Locations.Add(new Location
                     {
-                        Latitude = CurrentPlayer.Location.Latitude,
-                        Longitude = CurrentPlayer.Location.Longitude
+                        Latitude = GodController.CurrentPlayer.Location.Latitude,
+                        Longitude = GodController.CurrentPlayer.Location.Longitude
                     });
                 routeLine.Locations.Add(new Location
                     {
-                        Latitude = CurrentSpear.Location.Latitude,
-                        Longitude = CurrentSpear.Location.Longitude
+                        Latitude = GodController.CurrentSpear.Location.Latitude,
+                        Longitude = GodController.CurrentSpear.Location.Longitude
                     });
                 MapShapeLayer shapeLayer = new MapShapeLayer();
                 shapeLayer.Shapes.Add(routeLine);
@@ -196,32 +173,24 @@ namespace IPR.Control
             }
         }
 
-
-
-
-        //TODO: Fix DoubleTappedEvent
-        void Map_DoubleTapped(object sender, Windows.UI.Xaml.Input.DoubleTappedRoutedEventArgs e)
+        public void ClearMap()
         {
             if (Map.Children.Count > 0)
             {
                 Map.Children.Clear();
             }
+        }
 
+
+        //TODO: Fix DoubleTappedEvent
+        void Map_DoubleTapped(object sender, Windows.UI.Xaml.Input.DoubleTappedRoutedEventArgs e)
+        {
             var position = e.GetPosition(Map);
 
             Location loc;
             Map.TryPixelToLocation(position, out loc);
 
-            Pushpin pin = new Pushpin
-            {
-                Name = "Direction_Pin"
-            };
-
-            MapLayer.SetPosition(pin, loc);
-            Map.Children.Add(pin);
-
-            //Remove if its annoying to zoom in all the time!
-            Map.SetView(loc);
+            DirectionLocation = loc;
         }
     }
 }

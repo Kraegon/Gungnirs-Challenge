@@ -25,7 +25,6 @@ namespace IPR
     /// </summary>
     sealed partial class App : Application
     {
-        private static MapHandler HandleMap;
 
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
@@ -72,9 +71,6 @@ namespace IPR
 
                 // Place the frame in the current Window
                 Window.Current.Content = rootFrame;
-
-                //  initialize the GodController  //
-                GodController.Initialize();
 
                 rootFrame.Navigate(typeof(MainPage), e.Arguments);
             }
