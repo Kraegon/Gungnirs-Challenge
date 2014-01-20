@@ -120,7 +120,6 @@
     <Compile Include="Common\SuspensionManager.cs" />
     <Compile Include="Control\GodController.cs" />
     <Compile Include="Control\IOHandler.cs" />
-    <Compile Include="Control\LocationService.cs" />
     <Compile Include="Control\MapHandler.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>

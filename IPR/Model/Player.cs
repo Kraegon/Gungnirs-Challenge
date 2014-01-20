@@ -23,5 +23,24 @@ namespace IPR.Model
         /// The Score the player gets by throwing the spear.
         /// </summary>
         public double Score { get; set; }
+
+        public Player()
+        {
+            Name = null;
+            Location = null;
+            Score = 0.0;
+        }
+        public Player(string name)
+        {
+            Name = name;
+            Location = null;
+            Score = 0.0;
+        }
+        public Player(string name, Location location, double score)
+        {
+            Name = name;
+            Location = location;
+            Score = score;
+        }
     }
 }

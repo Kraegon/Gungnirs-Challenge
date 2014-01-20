@@ -16,39 +16,33 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using Bing.Maps;
 using IPR.Control;
+using Windows.UI.Core;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
 namespace IPR
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
     public sealed partial class MainPage : Page
     {
         private NavigationHelper navigationHelper;
         public NavigationHelper NavigationHelper
         {
             get { return this.navigationHelper; }
-        }       
-
+        }
+        public static CoreDispatcher dispatcher;
         public MainPage()
         {
             this.InitializeComponent();
-
+            dispatcher = this.Dispatcher;
             /* Initalizes the controllers and adds the map to the maphandler */
             GodController.GetMapHandler().SetMap(BingMap);
             GodController.GetMapHandler().Initialize();
+            GodController.GetMapHandler().Locator.PositionChanged += Locator_PositionChanged;
         }
 
-        public async void CenterPosition()
+        private async void Locator_PositionChanged(Windows.Devices.Geolocation.Geolocator sender, Windows.Devices.Geolocation.PositionChangedEventArgs args)
         {
-            while (LocationService.INSTANCE.CurrentPosition == null)
-            {
-                var location = new Bing.Maps.Location(LocationService.INSTANCE.CurrentPosition.Coordinate.Latitude,
-                                                       LocationService.INSTANCE.CurrentPosition.Coordinate.Longitude);
-                BingMap.SetView(location);
-            }
+            await dispatcher.RunAsync(CoreDispatcherPriority.Normal, DrawElements);
         }
 
         public Map GetMapObject()
@@ -56,20 +50,23 @@ namespace IPR
             return BingMap;
         }
 
-        public void DrawCurrentLocation(Location loc)
+        public void DrawElements()
         {
-            BingMap.SetView(loc, 9.0f);
-
+            //Set view
+            BingMap.SetView(GodController.CurrentPlayer.Location, 13.0f);
+            //Player pin
             Pushpin pin = new Pushpin()
             {
                 Text = "Me"
             };
-
             BingMap.Children.Add(pin);
-            MapLayer.SetPosition(pin, loc);
+            MapLayer.SetPosition(pin, GodController.CurrentPlayer.Location);
+            //Direction pin
+
+            //Spear (if available)
         }
 
-        async private void MapTabEvent(object sender, RoutedEventArgs e)
+        private void MapTapEvent(object sender, RoutedEventArgs e)
         {
             if (BingMap.Children.Count > 1)
             {

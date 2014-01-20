@@ -73,9 +73,6 @@ namespace IPR
                 // Place the frame in the current Window
                 Window.Current.Content = rootFrame;
 
-                //  initialize the GodController  //
-                GodController.Initialize();
-
                 rootFrame.Navigate(typeof(MainPage), e.Arguments);
             }
             // Ensure the current window is active
