@@ -29,7 +29,7 @@ namespace IPR.Control
         /// Navigates between the waypoints
         /// </summary>
         private DirectionsManager DirManager;
-
+        public Location DirectionLocation;
         public Geolocator Locator;
 
         public MapHandler()
@@ -114,8 +114,14 @@ namespace IPR.Control
             DirManager.Waypoints = pointsCollection;
         }
 
+        /// <summary>
+        /// Draws the walkable route to the spear, if the spear is unavailable
+        /// </summary>
         private async void DrawRouteToSpear()
         {
+            if (GodController.CurrentSpear.Available)
+                return;
+
             if (DirManager.Waypoints.Count > 1)
             {
                 DirectionsManager manager = DirManager;
@@ -123,6 +129,7 @@ namespace IPR.Control
                 RouteResponse response = await manager.CalculateDirectionsAsync();
 
                 manager.RequestOptions.RouteMode = RouteModeOption.Walking;
+
                 //not sure if usefull or not
                 //var distance = manager.RequestOptions.DistanceUnit;
 
@@ -166,31 +173,24 @@ namespace IPR.Control
             }
         }
 
-
+        public void ClearMap()
+        {
+            if (Map.Children.Count > 0)
+            {
+                Map.Children.Clear();
+            }
+        }
 
 
         //TODO: Fix DoubleTappedEvent
         void Map_DoubleTapped(object sender, Windows.UI.Xaml.Input.DoubleTappedRoutedEventArgs e)
         {
-            System.Diagnostics.Debug.WriteLine("Event double tapped worked");
+            var position = e.GetPosition(Map);
 
-            if (Map.Children.Count > 1)
-            {
-                Map.Children.Clear();
-            }
+            Location loc;
+            Map.TryPixelToLocation(position, out loc);
 
-            var position = GodController.CurrentPlayer.Location;
-
-            if (position == null) //Wait for the location to update
-                return;
-
-            Pushpin pin = new Pushpin
-            {
-                Name = "Direction_Pin"
-            };
-
-            MapLayer.SetPosition(pin, position);
-            Map.Children.Add(pin);
+            DirectionLocation = loc;
         }
     }
 }

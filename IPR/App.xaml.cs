@@ -25,7 +25,6 @@ namespace IPR
     /// </summary>
     sealed partial class App : Application
     {
-        private static MapHandler HandleMap;
 
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code

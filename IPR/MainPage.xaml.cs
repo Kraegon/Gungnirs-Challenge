@@ -15,7 +15,6 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using Bing.Maps;
-using IPR.Control;
 using Windows.UI.Core;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
@@ -35,9 +34,15 @@ namespace IPR
             this.InitializeComponent();
             dispatcher = this.Dispatcher;
             /* Initalizes the controllers and adds the map to the maphandler */
-            GodController.GetMapHandler().SetMap(BingMap);
-            GodController.GetMapHandler().Initialize();
-            GodController.GetMapHandler().Locator.PositionChanged += Locator_PositionChanged;
+            GodController.HandleMap.SetMap(BingMap);
+            GodController.HandleMap.Initialize();
+            GodController.HandleMap.Locator.PositionChanged += Locator_PositionChanged;
+            BingMap.DoubleTappedOverride += BingMap_DoubleTapped;
+        }
+
+        private async void BingMap_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+        {
+            await dispatcher.RunAsync(CoreDispatcherPriority.Normal, DrawElements);
         }
 
         private async void Locator_PositionChanged(Windows.Devices.Geolocation.Geolocator sender, Windows.Devices.Geolocation.PositionChangedEventArgs args)
@@ -52,18 +57,43 @@ namespace IPR
 
         public void DrawElements()
         {
+            //Clear pins
+            GodController.HandleMap.ClearMap();
             //Set view
-            BingMap.SetView(GodController.CurrentPlayer.Location, 13.0f);
+            if(BingMap.ZoomLevel < 13.0f)
+                BingMap.SetView(GodController.CurrentPlayer.Location, 13.0f);
+            else
+                BingMap.SetView(GodController.CurrentPlayer.Location, BingMap.ZoomLevel);
             //Player pin
-            Pushpin pin = new Pushpin()
+            if (GodController.CurrentPlayer != null)
             {
-                Text = "Me"
-            };
-            BingMap.Children.Add(pin);
-            MapLayer.SetPosition(pin, GodController.CurrentPlayer.Location);
+                Pushpin pin = new Pushpin()
+                {
+                    Text = "Me"
+                };
+                BingMap.Children.Add(pin);
+                MapLayer.SetPosition(pin, GodController.CurrentPlayer.Location);
+            }
             //Direction pin
-
+            if (GodController.HandleMap.DirectionLocation != null)
+            {
+                Pushpin pin = new Pushpin
+                {
+                    Name = "Direction_Pin"
+                };
+                BingMap.Children.Add(pin);
+                MapLayer.SetPosition(pin, GodController.HandleMap.DirectionLocation);
+            }
             //Spear (if available)
+            if ((GodController.CurrentSpear != null) && GodController.CurrentSpear.Available)
+            {
+                Pushpin pin = new Pushpin()
+                {
+                    Text = "Spear"
+                };
+                BingMap.Children.Add(pin);
+                MapLayer.SetPosition(pin, GodController.CurrentSpear.Location);
+            }
         }
 
         private void MapTapEvent(object sender, RoutedEventArgs e)

@@ -13,20 +13,21 @@ namespace IPR.Control
         /// <summary>
         /// The current active spear
         /// </summary>
-        public static Spear CurrentSpear;
+        public static Spear CurrentSpear { get; set; }
 
         /// <summary>
         /// The current active player
         /// </summary>
-        public static Player CurrentPlayer;
-
-        private static MapHandler HandleMap;
-
-        public static MapHandler GetMapHandler()
+        public static Player CurrentPlayer { get; set; }
+        private static MapHandler handleMap;
+        public static MapHandler HandleMap
         {
-            if(HandleMap == null)
-                HandleMap = new MapHandler();
-            return HandleMap;
+            get
+            {
+                if (handleMap == null)
+                    handleMap = new MapHandler();
+                return handleMap;
+            }
         }
 
         public static async void ShowMessage(string title, string description)
