@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Highscores>
+  <Highscore>
+    <Name>AAA</Name>
+    <Distance>999</Distance>
+    <Time>9:99</Time>
+  </Highscore>
+  <Highscore>
+    <Name>BBB</Name>
+    <Distance> 1000</Distance>
+    <Time>10:00</Time>
+  </Highscore>
+</Highscores>

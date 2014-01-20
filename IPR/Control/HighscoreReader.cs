@@ -11,19 +11,57 @@ using Windows.Storage;
 namespace IPR.Control
 {
     /// <summary>
-    /// TODO: Add more queries.
+    /// JSon
     /// </summary>
     class HighscoreReader
+    {
+        private static bool isInitialised = false;
+        private static IHighscoreReaderAdapter reader;
+
+        public HighscoreReader()
+        {
+            reader = new XMLReader();
+        }
+
+        public static async Task initAsync()
+        {
+            await reader.initAsync();
+            isInitialised = true;
+        }
+
+        public async static Task<List<HighscoreObj>> GetHighscoresAsync()
+        {
+            return await reader.GetHighscoresAsync();
+        }
+
+        public async static Task SaveHighscoreObj(HighscoreObj obj)
+        {
+            await reader.SaveHighscoreObj(obj);
+        }
+
+        public async static Task SaveHighscoreObjs(List<HighscoreObj> objs)
+        {
+            await reader.SaveHighscoreObjs(objs);
+        }
+    }
+
+    public interface IHighscoreReaderAdapter
+    {
+        Task initAsync();
+
+        Task<List<HighscoreObj>> GetHighscoresAsync();
+
+        Task SaveHighscoreObj(HighscoreObj obj);
+
+        Task SaveHighscoreObjs(List<HighscoreObj> objs);
+    }
+
+    public class JSonReader : IHighscoreReaderAdapter
     {
         private static JsonObject highscoreCompilation;
         private static bool isInitialised = false;
 
-        public HighscoreReader()
-        { 
-            //Can't init asynchronously, init is checked in get method.
-        }
-
-        private async Task initAsync()
+        public async Task initAsync()
         {
             string rawText = String.Empty;
             //Three steps neccesary to subvert access shenanigans
@@ -35,15 +73,13 @@ namespace IPR.Control
             highscoreCompilation = JsonObject.Parse(rawText)["stringRef"].GetObject();
             isInitialised = true;
         }
-        /// <summary>
-        /// TODO: Test it
-        /// </summary>
-        /// <param name="rank"></param>
-        /// <returns></returns>
-        public static HighscoreObj findByRank(int rank)
+
+        public async Task<List<HighscoreObj>> GetHighscoresAsync()
         {
+            if (!isInitialised)
+                await initAsync();
             HighscoreObj retVal = null;
-            JsonObject highscore = highscoreCompilation[rank.ToString()].GetObject();
+            JsonObject highscore = highscoreCompilation["hoi"].GetObject();
             try
             {
                 string name = highscore["Name"].GetString();
@@ -57,7 +93,41 @@ namespace IPR.Control
             {
                 retVal = new HighscoreObj();
             }
-            return retVal;
+            return null;
+        }
+
+
+        public Task SaveHighscoreObj(HighscoreObj obj)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task SaveHighscoreObjs(List<HighscoreObj> objs)
+        {
+            throw new NotImplementedException();
+        }
+    }
+    class XMLReader : IHighscoreReaderAdapter
+    {
+
+        public Task initAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<HighscoreObj>> GetHighscoresAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task SaveHighscoreObj(HighscoreObj obj)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task SaveHighscoreObjs(List<HighscoreObj> objs)
+        {
+            throw new NotImplementedException();
         }
     }
 }
