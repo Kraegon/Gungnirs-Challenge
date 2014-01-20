@@ -137,8 +137,14 @@ namespace IPR.Control
             DirManager.Waypoints = pointsCollection;
         }
 
+        /// <summary>
+        /// Draws the walkable route to the spear, if the spear is unavailable
+        /// </summary>
         private async void DrawRouteToSpear()
         {
+            if (CurrentSpear.Available)
+                return;
+
             if (DirManager.Waypoints.Count > 1)
             {
                 DirectionsManager manager = DirManager;
@@ -146,6 +152,7 @@ namespace IPR.Control
                 RouteResponse response = await manager.CalculateDirectionsAsync();
 
                 manager.RequestOptions.RouteMode = RouteModeOption.Walking;
+
                 //not sure if usefull or not
                 //var distance = manager.RequestOptions.DistanceUnit;
 
@@ -195,17 +202,17 @@ namespace IPR.Control
         //TODO: Fix DoubleTappedEvent
         void Map_DoubleTapped(object sender, Windows.UI.Xaml.Input.DoubleTappedRoutedEventArgs e)
         {
-            System.Diagnostics.Debug.WriteLine("Event double tapped worked");
 
-            if (Map.Children.Count > 1)
+            if (Map.Children.Count > 0)
             {
                 Map.Children.Clear();
             }
 
             var position = e.GetPosition(Map);
-           
-            Location loc = new Location(position.X, position.Y);
-            
+
+            Location loc;
+            Map.TryPixelToLocation(position, out loc);
+
             Pushpin pin = new Pushpin
             {
                 Name = "Direction_Pin"
@@ -213,6 +220,9 @@ namespace IPR.Control
 
             MapLayer.SetPosition(pin, loc);
             Map.Children.Add(pin);
+
+            //Remove if its annoying to zoom in all the time!
+            Map.SetView(loc);
         }
     }
 }
