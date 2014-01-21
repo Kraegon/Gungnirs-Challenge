@@ -122,9 +122,11 @@
     <Compile Include="Control\MapHandler.cs" />
     <Compile Include="Control\MathCalculation.cs" />
     <Compile Include="Control\SpearHandler.cs" />
+    <Compile Include="HighscoreReader.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Model\HighscoreObj.cs" />
     <Compile Include="Model\Player.cs" />
     <Compile Include="Model\Spear.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
