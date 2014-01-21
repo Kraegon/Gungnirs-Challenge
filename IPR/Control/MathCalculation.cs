@@ -28,7 +28,5 @@ namespace IPR.Control
 
             return angle;
         }
-
-
     }
 }
