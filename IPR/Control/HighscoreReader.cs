@@ -1,32 +1,33 @@
 ﻿using IPR.Model;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using Windows.Data.Json;
 using Windows.Storage;
+using System.Xml;
+using Windows.Data.Xml.Dom;
+using System.Linq;
 
 namespace IPR.Control
 {
     /// <summary>
-    /// JSon
+    /// Uses bridge pattern, reader options are XML or JSon
     /// </summary>
     class HighscoreReader
     {
-        private static bool isInitialised = false;
-        private static IHighscoreReaderAdapter reader;
-
-        public HighscoreReader()
-        {
-            reader = new XMLReader();
-        }
+        public static StorageFile HighscoreFile;  
+        
+        private static IHighscoreReaderBridge reader = new XMLReader();
+        public static bool IsInitialised = false;
+        public static bool IsFileEmpty = true;
 
         public static async Task initAsync()
         {
-            await reader.initAsync();
-            isInitialised = true;
+            await reader.InitAsync();
+            HighscoreReader.IsInitialised = true;
         }
 
         public async static Task<List<HighscoreObj>> GetHighscoresAsync()
@@ -43,11 +44,22 @@ namespace IPR.Control
         {
             await reader.SaveHighscoreObjs(objs);
         }
+
+        public async static Task<List<HighscoreObj>> SortHighestScoreFirstAsync()
+        {
+            List<HighscoreObj> unsortedHighscores = await GetHighscoresAsync();
+            var sortedVar = from highscore in unsortedHighscores
+                                        orderby highscore.Distance descending
+                                        select highscore;
+            List<HighscoreObj> sortedList = new List<HighscoreObj>(sortedVar.AsEnumerable<HighscoreObj>());
+            return sortedList;
+               
+        }
     }
 
-    public interface IHighscoreReaderAdapter
+    public interface IHighscoreReaderBridge
     {
-        Task initAsync();
+        Task InitAsync();
 
         Task<List<HighscoreObj>> GetHighscoresAsync();
 
@@ -55,29 +67,48 @@ namespace IPR.Control
 
         Task SaveHighscoreObjs(List<HighscoreObj> objs);
     }
-
-    public class JSonReader : IHighscoreReaderAdapter
+    /// <summary>
+    /// Json version
+    /// </summary>
+    public class JsonReader : IHighscoreReaderBridge
     {
         private static JsonObject highscoreCompilation;
-        private static bool isInitialised = false;
 
-        public async Task initAsync()
+        public async Task InitAsync()
         {
             string rawText = String.Empty;
             //Three steps neccesary to subvert access shenanigans
+            /* Use for access to ASSETS folder
             var installFolder = Windows.ApplicationModel.Package.Current.InstalledLocation;
             var subfolder = await installFolder.GetFolderAsync("Assets\\");
             var file = await subfolder.GetFileAsync("Highscores.json");
-
-            rawText = await FileIO.ReadTextAsync(file);                
-            highscoreCompilation = JsonObject.Parse(rawText)["stringRef"].GetObject();
-            isInitialised = true;
+            /**/
+            try {
+                HighscoreReader.HighscoreFile = await Windows.Storage.ApplicationData.Current.RoamingFolder.GetFileAsync("Highscore.Json");
+                rawText = await FileIO.ReadTextAsync(HighscoreReader.HighscoreFile);
+                highscoreCompilation = JsonObject.Parse(rawText)["stringRef"].GetObject();
+                HighscoreReader.IsInitialised = true;                
+            } catch (Exception e) {
+                string s = e.Message;
+            }
         }
-
+        private async Task CreateJsoFileAsync()
+        {
+            try
+            {
+                await ApplicationData.Current.RoamingFolder.CreateFileAsync("Highscores.Json");
+                await InitAsync();
+            }
+            catch
+            {
+                //If highscores init unsuccesful, we're doomed. Making a decent catch means filling in an error on the GUI.
+                //Let's make a healthy assumption this'll just work.
+            }
+        }
         public async Task<List<HighscoreObj>> GetHighscoresAsync()
         {
-            if (!isInitialised)
-                await initAsync();
+            if (!HighscoreReader.IsInitialised)
+                await InitAsync();
             HighscoreObj retVal = null;
             JsonObject highscore = highscoreCompilation["hoi"].GetObject();
             try
@@ -97,37 +128,137 @@ namespace IPR.Control
         }
 
 
-        public Task SaveHighscoreObj(HighscoreObj obj)
+        public async Task SaveHighscoreObj(HighscoreObj obj)
         {
+            if (!HighscoreReader.IsInitialised)
+                await InitAsync();
             throw new NotImplementedException();
         }
 
-        public Task SaveHighscoreObjs(List<HighscoreObj> objs)
+        public async Task SaveHighscoreObjs(List<HighscoreObj> objs)
         {
+            if (!HighscoreReader.IsInitialised)
+                await InitAsync();
             throw new NotImplementedException();
         }
     }
-    class XMLReader : IHighscoreReaderAdapter
-    {
 
-        public Task initAsync()
+    /// <summary>
+    /// XML version
+    /// </summary>
+    class XMLReader : IHighscoreReaderBridge
+    {       
+        public async Task InitAsync()
         {
-            throw new NotImplementedException();
+            try
+            {
+                HighscoreReader.HighscoreFile = await ApplicationData.Current.RoamingFolder.GetFileAsync("Highscores.xml");
+                HighscoreReader.IsInitialised = true;
+                HighscoreReader.IsFileEmpty = await checkFileEmpty();
+            }
+            catch (FileNotFoundException)
+            {
+                CreateXMLfileAsync();
+            }
         }
 
-        public Task<List<HighscoreObj>> GetHighscoresAsync()
+        private async Task CreateXMLfileAsync()
         {
-            throw new NotImplementedException();
+            try
+            {
+                await ApplicationData.Current.RoamingFolder.CreateFileAsync("Highscores.XML");
+                await InitAsync();
+            }
+            catch
+            {
+                //If highscores init unsuccesful, we're doomed. Making a decent catch means filling in an error on the GUI.
+                //Let's make a healthy assumption this'll just work.
+            }
         }
 
-        public Task SaveHighscoreObj(HighscoreObj obj)
+        private async Task<bool> checkFileEmpty()
         {
-            throw new NotImplementedException();
+            System.Xml.XmlReader XmlReader = System.Xml.XmlReader.Create(await HighscoreReader.HighscoreFile.OpenStreamForReadAsync());
+            try
+            {
+                XmlReader.Read();
+            }
+            catch (XmlException e)
+            {
+                if (e.Message.StartsWith("Root element")){
+                    XmlReader.Dispose();
+                    return true;
+                }
+                else
+                    System.Diagnostics.Debugger.Break();
+            }
+            XmlReader.Dispose();
+            return false;
         }
 
-        public Task SaveHighscoreObjs(List<HighscoreObj> objs)
+        public async Task<List<HighscoreObj>> GetHighscoresAsync()
         {
-            throw new NotImplementedException();
+            if (!HighscoreReader.IsInitialised)
+                await InitAsync();
+            if (HighscoreReader.IsFileEmpty)
+                return null;
+            List<HighscoreObj> retVal = new List<HighscoreObj>();
+            XmlDocument xmlDoc = await XmlDocument.LoadFromFileAsync(HighscoreReader.HighscoreFile);
+            var node = xmlDoc.SelectSingleNode("Highscores");
+            var nodeList = node.ChildNodes;
+            foreach (var e in nodeList)
+            {
+                HighscoreObj highscore = new HighscoreObj();
+                highscore.Name = (string) e.Attributes[0].NodeValue;
+                highscore.Distance = float.Parse((string)e.Attributes[1].NodeValue);
+                highscore.TimeTaken = TimeSpan.Parse((string)e.Attributes[2].NodeValue);
+                retVal.Add(highscore);
+            }
+            return retVal;
+        }
+
+        public async Task SaveHighscoreObj(HighscoreObj obj)
+        {
+            if (!HighscoreReader.IsInitialised)
+                await InitAsync();
+            if (HighscoreReader.IsFileEmpty)
+            {
+                //Create
+                XmlWriter xmlWriter = XmlWriter.Create(await HighscoreReader.HighscoreFile.OpenStreamForWriteAsync());
+                xmlWriter.WriteStartDocument();
+                xmlWriter.WriteStartElement("Highscores");
+                    xmlWriter.WriteStartElement("Highscore");
+                        xmlWriter.WriteAttributeString("Name", obj.Name);
+                        xmlWriter.WriteAttributeString("Distance", obj.Distance.ToString());
+                        xmlWriter.WriteAttributeString("Time", obj.TimeTaken.ToString());
+                    xmlWriter.WriteEndElement();
+                xmlWriter.WriteEndElement();
+                xmlWriter.WriteEndDocument();
+                xmlWriter.Flush();
+                xmlWriter.Dispose();
+                HighscoreReader.IsFileEmpty = false;
+            }
+            else 
+            {
+                //Append
+                XmlDocument xmlDoc = await XmlDocument.LoadFromFileAsync(HighscoreReader.HighscoreFile);
+                var node = xmlDoc.SelectSingleNode("Highscores");
+                var newElement = xmlDoc.CreateElement("Highscore");
+                newElement.SetAttribute("Name", obj.Name);
+                newElement.SetAttribute("Distance", obj.Distance.ToString());
+                newElement.SetAttribute("Time", obj.TimeTaken.ToString());
+                node.AppendChild(newElement);             
+                await xmlDoc.SaveToFileAsync(HighscoreReader.HighscoreFile);
+            }
+               
+        }
+
+        public async Task SaveHighscoreObjs(List<HighscoreObj> objs)
+        {
+            foreach (var obj in objs)
+            {
+                await SaveHighscoreObj(obj);
+            }
         }
     }
 }
