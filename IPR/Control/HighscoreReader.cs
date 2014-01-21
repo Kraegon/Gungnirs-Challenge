@@ -9,12 +9,11 @@ using Windows.Data.Json;
 using Windows.Storage;
 using System.Xml;
 using Windows.Data.Xml.Dom;
-using System.Linq;
 
 namespace IPR.Control
 {
     /// <summary>
-    /// Uses bridge pattern, reader options are XML or JSon
+    /// Uses bridge pattern, reader options are XML or JSon(Not implemented)
     /// </summary>
     class HighscoreReader
     {
@@ -23,6 +22,9 @@ namespace IPR.Control
         private static IHighscoreReaderBridge reader = new XMLReader();
         public static bool IsInitialised = false;
         public static bool IsFileEmpty = true;
+
+        public delegate void HighscoreUpdatedHandler();
+        public static event HighscoreUpdatedHandler HighscoreUpdatedEvent;
 
         public static async Task initAsync()
         {
@@ -38,16 +40,18 @@ namespace IPR.Control
         public async static Task SaveHighscoreObj(HighscoreObj obj)
         {
             await reader.SaveHighscoreObj(obj);
+            HighscoreUpdatedEvent();
         }
 
         public async static Task SaveHighscoreObjs(List<HighscoreObj> objs)
         {
             await reader.SaveHighscoreObjs(objs);
+            HighscoreUpdatedEvent();
         }
 
-        public async static Task<List<HighscoreObj>> SortHighestScoreFirstAsync()
+        public static List<HighscoreObj> SortHighestScoreFirst(List<HighscoreObj> objs)
         {
-            List<HighscoreObj> unsortedHighscores = await GetHighscoresAsync();
+            List<HighscoreObj> unsortedHighscores = objs;
             var sortedVar = from highscore in unsortedHighscores
                                         orderby highscore.Distance descending
                                         select highscore;
@@ -92,7 +96,7 @@ namespace IPR.Control
                 string s = e.Message;
             }
         }
-        private async Task CreateJsoFileAsync()
+        private async Task CreateJsonFileAsync()
         {
             try
             {
@@ -158,11 +162,11 @@ namespace IPR.Control
             }
             catch (FileNotFoundException)
             {
-                CreateXMLfileAsync();
+                CreateXMLfile();
             }
         }
 
-        private async Task CreateXMLfileAsync()
+        private async void CreateXMLfile()
         {
             try
             {
@@ -171,7 +175,7 @@ namespace IPR.Control
             }
             catch
             {
-                //If highscores init unsuccesful, we're doomed. Making a decent catch means filling in an error on the GUI.
+                //If highscores init unsuccesful, we're doomed. Making a decent catch means filling in an error report on the GUI.
                 //Let's make a healthy assumption this'll just work.
             }
         }

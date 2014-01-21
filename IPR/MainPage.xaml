@@ -7,25 +7,50 @@
     xmlns:Maps="using:Bing.Maps"
     x:Class="IPR.MainPage"
     mc:Ignorable="d">
-
+    <Page.Resources>
+        <DataTemplate x:Key="HighscoreTemplate">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" /> 
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock x:Name="NameBlock" Text="{Binding Name}" Margin="5,5,5,5" Grid.Row="0" Grid.Column="0"/>
+                <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="0">
+                    <TextBlock Text="Distance: " HorizontalAlignment="Left" Margin="5,5,5,5" />
+                    <TextBlock x:Name="DistanceBlock" HorizontalAlignment="Right" Text="{Binding Distance}" Margin="5,5,5,5"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1">
+                    <TextBlock Text="Time: " HorizontalAlignment="Left" Margin="5,5,5,5" />
+                    <TextBlock x:Name="TimeBlock" HorizontalAlignment="Right" Text="{Binding TimeTaken}" Margin="5,5,5,5" />
+                </StackPanel>
+          </Grid>
+        </DataTemplate>
+    </Page.Resources>
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="315*"/>
-            <ColumnDefinition Width="1051*"/>
+            <ColumnDefinition Width="1050*"/>
         </Grid.ColumnDefinitions>
         <Grid Grid.Column="0">
-            <Grid>
+            <Grid x:Name="LeftBarGrid">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="91*"/>
-                    <RowDefinition Height="293*"/>
+                    <RowDefinition Height="90*"/>
+                    <RowDefinition Height="240*"/>
                     <RowDefinition Height="180*"/>
-                    <RowDefinition Height="204*"/>
+                    <RowDefinition Height="200*"/>
                 </Grid.RowDefinitions>
                 <TextBlock HorizontalAlignment="Left" Margin="80,23,0,0" TextWrapping="Wrap" Text="Catchy Title" VerticalAlignment="Top" Height="53" Width="186" FontSize="36" RenderTransformOrigin="0.249,0.548"/>
-                <Image HorizontalAlignment="Left" Height="100" Margin="30,44,0,0" Grid.Row="3" VerticalAlignment="Top" Width="100" />
+                <Image HorizontalAlignment="Left" Height="100" Margin="30,44,0,0" Grid.Row="4" VerticalAlignment="Top" Width="100" />
                 <Button  HorizontalAlignment="Left" Style="{StaticResource NavigationBackButtonNormalStyle}" 
 					Command="{Binding NavigationHelper.GoBackCommand, ElementName=pageRoot}"
 					Margin="7,14,0,0" VerticalAlignment="Top" Height="59" Width="61" RenderTransformOrigin="0.147,0.308"/>
+                <ScrollViewer Grid.Row="1" VerticalAlignment="Top" HorizontalAlignment="Stretch" VerticalScrollMode="Enabled">
+                    <ListBox x:Name="HighscoreBox"  />
+                </ScrollViewer>
             </Grid>
         </Grid>
         <Maps:Map x:Name="BingMap" Grid.Column="1" HorizontalAlignment="Left" Height="768" VerticalAlignment="Top" Width="1051"

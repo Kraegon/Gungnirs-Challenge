@@ -122,7 +122,7 @@
     <Compile Include="Control\MapHandler.cs" />
     <Compile Include="Control\MathCalculation.cs" />
     <Compile Include="Control\SpearHandler.cs" />
-    <Compile Include="HighscoreReader.cs" />
+    <Compile Include="Control\HighscoreReader.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
