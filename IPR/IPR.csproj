@@ -119,13 +119,12 @@
     <Compile Include="Common\RelayCommand.cs" />
     <Compile Include="Common\SuspensionManager.cs" />
     <Compile Include="Control\GodController.cs" />
-    <Compile Include="Control\HighscoreReader.cs" />
     <Compile Include="Control\MapHandler.cs" />
     <Compile Include="Control\MathCalculation.cs" />
+    <Compile Include="Control\SpearHandler.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Model\HighscoreObj.cs" />
     <Compile Include="Model\Player.cs" />
     <Compile Include="Model\Spear.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -135,7 +134,6 @@
     <AppxManifest Include="Package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
-    <None Include="Assets\Highscores.json" />
     <None Include="IPR_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
@@ -143,7 +141,6 @@
     <Content Include="Assets\SmallLogo.scale-100.png" />
     <Content Include="Assets\SplashScreen.scale-100.png" />
     <Content Include="Assets\StoreLogo.scale-100.png" />
-    <Content Include="Assets\HIghscores.xml" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
