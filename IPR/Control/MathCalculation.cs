@@ -42,11 +42,12 @@ namespace IPR.Control
         {
             int seconds = (int)spawn.TotalSeconds;
             int dist = (int)distance;
+            int ans;
 
+            ans = ((dist / seconds) * (dist * 200)^2) / seconds;
 
-
-
-            return 10;
+            System.Diagnostics.Debug.WriteLine(ans.ToString());
+            return ans;
         }
     }
 }
