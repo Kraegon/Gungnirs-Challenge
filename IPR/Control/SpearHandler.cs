@@ -8,5 +8,7 @@ namespace IPR.Control
 {
     class SpearHandler
     {
+//        public static Location 
+
     }
 }

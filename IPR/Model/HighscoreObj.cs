@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace IPR.Model
 {
-    class HighscoreObj
+    public class HighscoreObj
     {
         public string Name { get; set; }
         public float Distance { get; set; }

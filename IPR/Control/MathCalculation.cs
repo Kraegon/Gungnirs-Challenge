@@ -28,5 +28,25 @@ namespace IPR.Control
 
             return angle;
         }
+
+
+        /// <summary>
+        /// calculates the score for the xml file.
+        /// calculation is the longer you take the less score you have,
+        /// if the distance is low, your score will also be
+        /// </summary>
+        /// <param name="distance"></param>
+        /// <param name="spawn"></param>
+        /// <returns>int</returns>
+        public static int CalculateScore(float distance, TimeSpan spawn)
+        {
+            int seconds = (int)spawn.TotalSeconds;
+            int dist = (int)distance;
+
+
+
+
+            return 10;
+        }
     }
 }
