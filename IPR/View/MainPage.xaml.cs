@@ -73,7 +73,7 @@ namespace IPR
             await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
                 DrawElements();
-                if (!SpearHandler.Gungnir.Available)
+                if ((SpearHandler.Gungnir != null) && !SpearHandler.Gungnir.Available)
                     YourDistanceBlock.Text = String.Empty + 10.0; //TODO: Turn into distance thrown.
                 if (SpearHandler.State == GameState.Retrieving)
                     YourTimeBlock.Text = TimeSpan.Parse("10:00").ToString(); //TODO: Turn into time taken so far.
@@ -124,6 +124,7 @@ namespace IPR
                 {
                     Name = "Direction_Pin"
                 };
+                pin.Background = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 0, 0, 255));
                 BingMap.Children.Add(pin);
                 MapLayer.SetPosition(pin, GodController.DirectionLocation);
             }
@@ -134,6 +135,7 @@ namespace IPR
                 {
                     Text = "Spear"
                 };
+                pin.Background = new SolidColorBrush(Windows.UI.Color.FromArgb(255,125,125,0));
                 BingMap.Children.Add(pin);
                 MapLayer.SetPosition(pin, SpearHandler.Gungnir.Location);
             }
@@ -149,9 +151,11 @@ namespace IPR
             
         }
 
-        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        private async void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            HighscoreReader.
+            await HighscoreReader.SaveHighscoreObj(new HighscoreObj(NameTextBox.Text,
+                                                                    float.Parse(YourDistanceBlock.Text),
+                                                                    TimeSpan.Parse(YourTimeBlock.Text)));
         }
     }
 }

@@ -118,8 +118,9 @@ namespace IPR.Control
             Map.TryPixelToLocation(position, out loc);
 
             GodController.DirectionLocation = loc;
-
-            SpearHandler.LetsThrow();
+            
+            if(SpearHandler.State == GameState.Idle)
+                SpearHandler.StartThrow();
         }
     }
 }

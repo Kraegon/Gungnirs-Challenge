@@ -20,88 +20,158 @@ namespace IPR.Control
     /// </summary>
     public class SpearHandler
     {
-        public static Spear Gungnir = new Spear();
-        public static GameState State;
+        private static int throwPower;
+
+        public static Spear Gungnir;
+        public static GameState State = GameState.Idle;
 //        System.Threading.Timer timer = new System.Threading.Timer();
         public delegate void SpearLocationUpdateHandler();
         public static event SpearLocationUpdateHandler SpearLocationUpdateEvent;
 
-        
+        public delegate void UpdateGameStateHandler();
+        public static event UpdateGameStateHandler UpdateGameStateEvent;
+
         /// <summary>
         /// This is the games procedure.
         /// </summary>
         /// <returns> Success </returns>
-        public async static void LetsThrow()
+        public async static void ExecuteStateOperation()
         {
-            Gungnir = new Spear
+            if (Gungnir == null)
             {
-                Available = true
-            };
-            State = GameState.PowerDetermining;
-            int power = DeterminePower();
-            await Task.Delay(5000);  // Await Power determining
-            System.Diagnostics.Debug.WriteLine("SpearThrowing");
-            State = GameState.SpearThrowing;
-            ThrowSpear(power);
-            await Task.Delay(5000);  // Await Spear throwing
-            System.Diagnostics.Debug.WriteLine("route Drawing");
+                Gungnir = new Spear
+                {
+                    Available = true
+                };
+            }
+            if (State > GameState.Retrieving)
+                State = GameState.Idle;
+            switch (State)
+            {
+                case GameState.PowerDetermining:
+                    throwPower = DeterminePower();
+                    UpdateGameStateEvent();
+                    break;
+                case GameState.SpearThrowing:
+                    await ThrowSpear(throwPower);
+                    break;
+                case GameState.RouteDrawing:
+                    DrawRoute();
+                    break;
+                case GameState.Retrieving:
+                    RetrieveSpear();
+                    break;
+            }
+        }
 
-            State = GameState.RouteDrawing;
-            await Task.Delay(5000);  // Await route drawing
-            System.Diagnostics.Debug.WriteLine("Retrieving");
-            State = GameState.Retrieving;
-            await Task.Delay(5000);  // Await Spear retrieving
-            State = GameState.Idle;
+        public static void StartThrow()
+        {
+            if (UpdateGameStateEvent == null)
+                UpdateGameStateEvent += SpearHandler_UpdateGameStateEvent;
+            UpdateGameStateEvent();
+        }
+
+        private static void SpearHandler_UpdateGameStateEvent()
+        {
+            State += 1;
+            ExecuteStateOperation();
         }
 
         public static int DeterminePower()
         {
-            return 100;
+            int retVal = 100;
+            return retVal;
         }
 
-        public static async void ThrowSpear(int power)
+        public static async Task ThrowSpear(int power)
         {
             int Pow = MathCalculation.CalculateDistance(power);
 
             if (GodController.DirectionLocation == null || Gungnir == null)
                 return;
-
-            while(Pow > 0)
-            {
-                updateSpearLocation();
-
-                System.Diagnostics.Debug.WriteLine(Pow.ToString());
-                Pow--;
-                await Task.Delay(100);
-            }
-
-                       
-
+            Gungnir.Location = GodController.CurrentPlayer.Location;
+            await updateSpearLocation();
+            UpdateGameStateEvent();
         }
 
-        private static void updateSpearLocation()
+        private async static Task updateSpearLocation()
         {
-            Gungnir.Location = new Location(
-                GodController.CurrentPlayer.Location.Longitude + 0.000001 * Math.Cos(GodController.DirectionLocation.Longitude),
-                GodController.CurrentPlayer.Location.Latitude + 0.000001 * Math.Sin(GodController.DirectionLocation.Latitude));
-            SpearLocationUpdateEvent();
+            /*
+            if((GodController.CurrentPlayer.Location.Latitude > GodController.DirectionLocation.Latitude)
+                && (GodController.CurrentPlayer.Location.Longitude > GodController.DirectionLocation.Longitude))
+            {
+                Gungnir.Location = new Location(
+                Gungnir.Location.Latitude - 0.0001 * ((Math.PI) * MathCalculation.SOH(GodController.CurrentPlayer.Location, GodController.DirectionLocation)),
+                Gungnir.Location.Longitude - 0.0001 * ((Math.PI) * MathCalculation.CAH(GodController.CurrentPlayer.Location, GodController.DirectionLocation))
+                );
+            }
+            else if ((GodController.CurrentPlayer.Location.Latitude < GodController.DirectionLocation.Latitude)
+              && (GodController.CurrentPlayer.Location.Longitude > GodController.DirectionLocation.Longitude))
+            {
+                Gungnir.Location = new Location(
+                Gungnir.Location.Latitude + 0.0001 * ((Math.PI) * MathCalculation.SOH(GodController.CurrentPlayer.Location, GodController.DirectionLocation)),
+                Gungnir.Location.Longitude - 0.0001 * ((Math.PI) * MathCalculation.CAH(GodController.CurrentPlayer.Location, GodController.DirectionLocation))
+                );
+            }
+            else if ((GodController.CurrentPlayer.Location.Latitude > GodController.DirectionLocation.Latitude)
+              && (GodController.CurrentPlayer.Location.Longitude < GodController.DirectionLocation.Longitude))
+            {
+                Gungnir.Location = new Location(
+                Gungnir.Location.Latitude - 0.0001 * ((Math.PI) * MathCalculation.SOH(GodController.CurrentPlayer.Location, GodController.DirectionLocation)),
+                Gungnir.Location.Longitude + 0.0001 * ((Math.PI) * MathCalculation.CAH(GodController.CurrentPlayer.Location, GodController.DirectionLocation))
+                );
+            }
+            else
+            {
+                Gungnir.Location = new Location(
+                Gungnir.Location.Latitude + 0.0001 * ((Math.PI) * MathCalculation.SOH(GodController.CurrentPlayer.Location, GodController.DirectionLocation)),
+                Gungnir.Location.Longitude + 0.0001 * ((Math.PI) * MathCalculation.CAH(GodController.CurrentPlayer.Location, GodController.DirectionLocation))
+                );
+            }*/
+            double a = MathCalculation.Delta(GodController.CurrentPlayer.Location.Longitude, GodController.DirectionLocation.Longitude) /
+                       MathCalculation.Delta(GodController.CurrentPlayer.Location.Latitude, GodController.DirectionLocation.Latitude);
+            double b = GodController.CurrentPlayer.Location.Longitude - (a * GodController.CurrentPlayer.Location.Latitude);
+            if (GodController.CurrentPlayer.Location.Latitude < GodController.DirectionLocation.Latitude)
+            {
+                for (double x = 0; x < 0.01; x += 0.0001)
+                {
+                    Gungnir.Location = new Location(
+                        GodController.CurrentPlayer.Location.Latitude + x,
+                        (a * (GodController.CurrentPlayer.Location.Latitude + x)) + b
+                    );
+                    await Task.Delay(10);
+                    SpearLocationUpdateEvent();
+                }
+            }
+            else
+            {
+                for (double x = 0; x > -0.01; x -= 0.0001)
+                {
+                    Gungnir.Location = new Location(
+                        GodController.CurrentPlayer.Location.Latitude + x,
+                        (a * (GodController.CurrentPlayer.Location.Latitude + x)) + b
+                    );
+                    await Task.Delay(10);
+                    SpearLocationUpdateEvent();
+                }
+            }
+            
         }
 
         public static void DrawRoute()
         {
             //Relay the command to draw the route to Gungnir
-            return;
+            UpdateGameStateEvent();
         }
 
         public static void RetrieveSpear()
         {
             //Set up the event when the spear is retrieved and handle ending procedure.
-            return;
+            UpdateGameStateEvent();
         }
 
         private void DrawThrownRoute()
         {
-
             if (Gungnir.Available)
                 return;
             try
