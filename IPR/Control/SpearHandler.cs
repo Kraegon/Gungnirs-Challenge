@@ -53,13 +53,13 @@ namespace IPR.Control
                     break;
                 case GameState.SpearThrowing:
                     ThrowSpear(throwPower);
-                    Gungnir.Available = false;
                     break;
                 case GameState.RouteDrawing:
                     DrawRoute();
                     break;
                 case GameState.Retrieving:
                     RetrieveSpear();
+                    Gungnir.Available = false;
                     break;
             }
         }
@@ -79,7 +79,7 @@ namespace IPR.Control
 
         public static int DeterminePower()
         {
-            int retVal = 2000;
+            int retVal = 100;
             return retVal;
         }
 

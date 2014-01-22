@@ -89,6 +89,9 @@ namespace IPR
                     SpearAvailableBlock.Text = "Not available";
                     SpearAvailableBlock.Foreground = new SolidColorBrush(Windows.UI.Colors.Red);
                 }
+                //geofence replica
+                if ((SatanController.CurrentPlayer != null && SpearHandler.Gungnir != null) && SpearHandler.Gungnir.Location != null)
+                    AntiGeofencing(SatanController.CurrentPlayer.Location, SpearHandler.Gungnir.Location);
                 //if (Condition for button)
                 SaveButton.IsEnabled = false;
                 DrawElements();
@@ -174,6 +177,22 @@ namespace IPR
             await HighscoreReader.SaveHighscoreObj(new HighscoreObj(NameTextBox.Text,
                                                                     float.Parse(YourDistanceBlock.Text),
                                                                     TimeSpan.Parse(YourTimeBlock.Text)));
+        }
+
+        private async void AntiGeofencing(Location playerLocation, Location fenceLocation)
+        {
+            if ((playerLocation.Latitude < fenceLocation.Latitude + 0.0005 
+                && playerLocation.Latitude > fenceLocation.Latitude - 0.0005 
+                && playerLocation.Longitude < fenceLocation.Longitude + 0.0005 
+                && playerLocation.Longitude > fenceLocation.Longitude - 0.0005) 
+                && !SpearHandler.Gungnir.Available)
+            {
+                System.Diagnostics.Debug.WriteLine("Entered the geofence event and state.Entered");
+                await SatanController.ShowMessageAsync("Gungnir", "Has been picked up!");
+                SpearHandler.Gungnir.Available = true;
+
+                //TODO: Remove the pushpin for the spear!
+            }
         }
     }
 }
