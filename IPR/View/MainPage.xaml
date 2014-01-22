@@ -43,7 +43,7 @@
                     <RowDefinition Height="180*"/>
                     <RowDefinition Height="200*"/>
                 </Grid.RowDefinitions>
-                <TextBlock HorizontalAlignment="Left" Margin="80,23,0,0" TextWrapping="Wrap" Text="Catchy Title" VerticalAlignment="Top" Height="53" Width="186" FontSize="36" RenderTransformOrigin="0.249,0.548"/>
+                <TextBlock HorizontalAlignment="Left" Margin="80,0,0,0" TextWrapping="Wrap" Text="Gungnir's Challenge" VerticalAlignment="Top" Height="auto" Width="186" FontSize="36" RenderTransformOrigin="0.249,0.548"/>
                 <Image HorizontalAlignment="Left" Height="100" Margin="30,44,0,0" Grid.Row="4" VerticalAlignment="Top" Width="100" />
                 <Button  HorizontalAlignment="Left" Style="{StaticResource NavigationBackButtonNormalStyle}" 
 					Command="{Binding NavigationHelper.GoBackCommand, ElementName=pageRoot}"
@@ -51,6 +51,21 @@
                 <ScrollViewer Grid.Row="1" VerticalAlignment="Top" HorizontalAlignment="Stretch" VerticalScrollMode="Enabled">
                     <ListBox x:Name="HighscoreBox"  />
                 </ScrollViewer>
+                <StackPanel Grid.Column="0" Grid.Row="2">
+                    <TextBlock Text="Please fill in your name:" FontSize="21" Margin="10,10,0,0"/>
+                    <TextBox x:Name="NameTextBox" Margin="10,10,10,0" />
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Your distance: " Margin="10,10,0,0" FontSize="21"/>
+                        <TextBlock x:Name="YourDistanceBlock" Text="0.0" Margin="10,10,0,0" FontSize="21"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Your time taken: " Margin="10,10,0,0" FontSize="21"/>
+                        <TextBlock x:Name="YourTimeBlock" Text="00:00:00" Margin="10,10,0,0" FontSize="21"/>
+                    </StackPanel>
+                    <Button x:Name="SaveButton" Click="SaveButton_Click" HorizontalAlignment="Center">
+                        <TextBlock Text="Save" FontSize="21"/>
+                    </Button>
+                </StackPanel>
             </Grid>
         </Grid>
         <Maps:Map x:Name="BingMap" Grid.Column="1" HorizontalAlignment="Left" Height="768" VerticalAlignment="Top" Width="1051"
