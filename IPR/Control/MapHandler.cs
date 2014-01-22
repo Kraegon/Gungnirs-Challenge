@@ -199,6 +199,7 @@ namespace IPR.Control
             GodController.DirectionLocation = loc;
 
             SpearHandler.LetsThrow();
+            DrawWalkableRouteToSpear(GodController.CurrentPlayer.Location, SpearHandler.Gungnir.Location);
         }
     }
 }

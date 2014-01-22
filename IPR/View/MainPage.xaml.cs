@@ -73,7 +73,7 @@ namespace IPR
             await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
                 DrawElements();
-                if (!SpearHandler.Gungnir.Available)
+                if (SpearHandler.Gungnir == null || !SpearHandler.Gungnir.Available)
                     YourDistanceBlock.Text = String.Empty + 10.0; //TODO: Turn into distance thrown.
                 if (SpearHandler.State == GameState.Retrieving)
                     YourTimeBlock.Text = TimeSpan.Parse("10:00").ToString(); //TODO: Turn into time taken so far.
@@ -151,7 +151,7 @@ namespace IPR
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            HighscoreReader.
+//            HighscoreReader.
         }
     }
 }

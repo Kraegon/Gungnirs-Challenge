@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.Devices.Geolocation;
 using Bing.Maps;
-using IPR.Model;
 
 namespace IPR.Control
 {
@@ -20,9 +19,8 @@ namespace IPR.Control
     /// </summary>
     public class SpearHandler
     {
-        public static Spear Gungnir = new Spear();
+        public static Spear Gungnir;
         public static GameState State;
-//        System.Threading.Timer timer = new System.Threading.Timer();
         public delegate void SpearLocationUpdateHandler();
         public static event SpearLocationUpdateHandler SpearLocationUpdateEvent;
 
@@ -90,12 +88,14 @@ namespace IPR.Control
         public static void DrawRoute()
         {
             //Relay the command to draw the route to Gungnir
+            //Handled in maphandler MapHandler.DrawWalkableRouteToSpear(parameters)
             return;
         }
 
         public static void RetrieveSpear()
         {
             //Set up the event when the spear is retrieved and handle ending procedure.
+            //Handled in maphandler! event in 
             return;
         }
 
