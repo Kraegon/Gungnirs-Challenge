@@ -7,7 +7,7 @@ using Bing.Maps;
 
 namespace IPR.Model
 {
-    class Player
+    public class Player
     {
         /// <summary>
         /// The Current name of the player

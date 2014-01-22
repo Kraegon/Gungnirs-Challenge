@@ -16,6 +16,7 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using Bing.Maps;
 using Windows.UI.Core;
+using IPR.Model;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -24,6 +25,9 @@ namespace IPR
     public sealed partial class MainPage : Page
     {
         private NavigationHelper navigationHelper;
+
+        public List<HighscoreObj> DisplayedHighscores { get; set; }
+
         public NavigationHelper NavigationHelper
         {
             get { return this.navigationHelper; }
@@ -38,6 +42,22 @@ namespace IPR
             GodController.HandleMap.Initialize();
             GodController.HandleMap.Locator.PositionChanged += Locator_PositionChanged;
             BingMap.DoubleTappedOverride += BingMap_DoubleTapped;
+            /* Initialise the highscores and databinding to it */
+            HighscoreInit();
+            HighscoreReader.HighscoreUpdatedEvent += HighscoreReader_HighscoreUpdatedEvent;
+        }
+
+        private async void HighscoreReader_HighscoreUpdatedEvent()
+        {
+            DisplayedHighscores = await HighscoreReader.SortHighestScoreFirst(await HighscoreReader.GetHighscoresAsync());
+            HighscoreBox.ItemsSource = null;
+            HighscoreBox.ItemsSource = DisplayedHighscores;
+        }
+        private async void HighscoreInit()
+        {
+            DisplayedHighscores = await HighscoreReader.SortHighestScoreFirst(await HighscoreReader.GetHighscoresAsync());
+            HighscoreBox.ItemTemplate = Resources["HighscoreTemplate"] as DataTemplate;
+            HighscoreBox.ItemsSource = DisplayedHighscores;
         }
 
         private async void BingMap_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)

@@ -9,20 +9,22 @@ using Windows.Data.Json;
 using Windows.Storage;
 using System.Xml;
 using Windows.Data.Xml.Dom;
-using System.Linq;
 
 namespace IPR.Control
 {
     /// <summary>
-    /// Uses bridge pattern, reader options are XML or JSon
+    /// Uses bridge pattern, reader options are XML or JSon(Not implemented)
     /// </summary>
     class HighscoreReader
     {
-        public static StorageFile HighscoreFile;  
-        
+        public static StorageFile HighscoreFile;
+
         private static IHighscoreReaderBridge reader = new XMLReader();
         public static bool IsInitialised = false;
         public static bool IsFileEmpty = true;
+
+        public delegate void HighscoreUpdatedHandler();
+        public static event HighscoreUpdatedHandler HighscoreUpdatedEvent;
 
         public static async Task initAsync()
         {
@@ -38,22 +40,26 @@ namespace IPR.Control
         public async static Task SaveHighscoreObj(HighscoreObj obj)
         {
             await reader.SaveHighscoreObj(obj);
+            HighscoreUpdatedEvent();
         }
 
         public async static Task SaveHighscoreObjs(List<HighscoreObj> objs)
         {
             await reader.SaveHighscoreObjs(objs);
+            HighscoreUpdatedEvent();
         }
 
-        public async static Task<List<HighscoreObj>> SortHighestScoreFirstAsync()
+        public async static Task<List<HighscoreObj>> SortHighestScoreFirst(List<HighscoreObj> objs)
         {
-            List<HighscoreObj> unsortedHighscores = await GetHighscoresAsync();
+            if (!IsInitialised)
+                await initAsync();
+            List<HighscoreObj> unsortedHighscores = objs;
             var sortedVar = from highscore in unsortedHighscores
-                                        orderby highscore.Distance descending
-                                        select highscore;
+                            orderby highscore.Distance descending
+                            select highscore;
             List<HighscoreObj> sortedList = new List<HighscoreObj>(sortedVar.AsEnumerable<HighscoreObj>());
             return sortedList;
-               
+
         }
     }
 
@@ -83,16 +89,19 @@ namespace IPR.Control
             var subfolder = await installFolder.GetFolderAsync("Assets\\");
             var file = await subfolder.GetFileAsync("Highscores.json");
             /**/
-            try {
+            try
+            {
                 HighscoreReader.HighscoreFile = await Windows.Storage.ApplicationData.Current.RoamingFolder.GetFileAsync("Highscore.Json");
                 rawText = await FileIO.ReadTextAsync(HighscoreReader.HighscoreFile);
                 highscoreCompilation = JsonObject.Parse(rawText)["stringRef"].GetObject();
-                HighscoreReader.IsInitialised = true;                
-            } catch (Exception e) {
+                HighscoreReader.IsInitialised = true;
+            }
+            catch (Exception e)
+            {
                 string s = e.Message;
             }
         }
-        private async Task CreateJsoFileAsync()
+        private async Task CreateJsonFileAsync()
         {
             try
             {
@@ -114,7 +123,7 @@ namespace IPR.Control
             try
             {
                 string name = highscore["Name"].GetString();
-                float distance = (float) highscore["Distance"].GetNumber();
+                float distance = (float)highscore["Distance"].GetNumber();
                 string[] time = highscore["TimeTaken"].GetString().Split(':');
                 int hours = int.Parse(time[0]);
                 int minutes = int.Parse(time[1]);
@@ -147,7 +156,7 @@ namespace IPR.Control
     /// XML version
     /// </summary>
     class XMLReader : IHighscoreReaderBridge
-    {       
+    {
         public async Task InitAsync()
         {
             try
@@ -158,11 +167,11 @@ namespace IPR.Control
             }
             catch (FileNotFoundException)
             {
-                CreateXMLfileAsync();
+                CreateXMLfile();
             }
         }
 
-        private async Task CreateXMLfileAsync()
+        private async void CreateXMLfile()
         {
             try
             {
@@ -171,7 +180,7 @@ namespace IPR.Control
             }
             catch
             {
-                //If highscores init unsuccesful, we're doomed. Making a decent catch means filling in an error on the GUI.
+                //If highscores init unsuccesful, we're doomed. Making a decent catch means filling in an error report on the GUI.
                 //Let's make a healthy assumption this'll just work.
             }
         }
@@ -185,7 +194,8 @@ namespace IPR.Control
             }
             catch (XmlException e)
             {
-                if (e.Message.StartsWith("Root element")){
+                if (e.Message.StartsWith("Root element"))
+                {
                     XmlReader.Dispose();
                     return true;
                 }
@@ -201,7 +211,7 @@ namespace IPR.Control
             if (!HighscoreReader.IsInitialised)
                 await InitAsync();
             if (HighscoreReader.IsFileEmpty)
-                return null;
+                return new List<HighscoreObj>();
             List<HighscoreObj> retVal = new List<HighscoreObj>();
             XmlDocument xmlDoc = await XmlDocument.LoadFromFileAsync(HighscoreReader.HighscoreFile);
             var node = xmlDoc.SelectSingleNode("Highscores");
@@ -209,7 +219,7 @@ namespace IPR.Control
             foreach (var e in nodeList)
             {
                 HighscoreObj highscore = new HighscoreObj();
-                highscore.Name = (string) e.Attributes[0].NodeValue;
+                highscore.Name = (string)e.Attributes[0].NodeValue;
                 highscore.Distance = float.Parse((string)e.Attributes[1].NodeValue);
                 highscore.TimeTaken = TimeSpan.Parse((string)e.Attributes[2].NodeValue);
                 retVal.Add(highscore);
@@ -227,18 +237,18 @@ namespace IPR.Control
                 XmlWriter xmlWriter = XmlWriter.Create(await HighscoreReader.HighscoreFile.OpenStreamForWriteAsync());
                 xmlWriter.WriteStartDocument();
                 xmlWriter.WriteStartElement("Highscores");
-                    xmlWriter.WriteStartElement("Highscore");
-                        xmlWriter.WriteAttributeString("Name", obj.Name);
-                        xmlWriter.WriteAttributeString("Distance", obj.Distance.ToString());
-                        xmlWriter.WriteAttributeString("Time", obj.TimeTaken.ToString());
-                    xmlWriter.WriteEndElement();
+                xmlWriter.WriteStartElement("Highscore");
+                xmlWriter.WriteAttributeString("Name", obj.Name);
+                xmlWriter.WriteAttributeString("Distance", obj.Distance.ToString());
+                xmlWriter.WriteAttributeString("Time", obj.TimeTaken.ToString());
+                xmlWriter.WriteEndElement();
                 xmlWriter.WriteEndElement();
                 xmlWriter.WriteEndDocument();
                 xmlWriter.Flush();
                 xmlWriter.Dispose();
                 HighscoreReader.IsFileEmpty = false;
             }
-            else 
+            else
             {
                 //Append
                 XmlDocument xmlDoc = await XmlDocument.LoadFromFileAsync(HighscoreReader.HighscoreFile);
@@ -247,10 +257,10 @@ namespace IPR.Control
                 newElement.SetAttribute("Name", obj.Name);
                 newElement.SetAttribute("Distance", obj.Distance.ToString());
                 newElement.SetAttribute("Time", obj.TimeTaken.ToString());
-                node.AppendChild(newElement);             
+                node.AppendChild(newElement);
                 await xmlDoc.SaveToFileAsync(HighscoreReader.HighscoreFile);
             }
-               
+
         }
 
         public async Task SaveHighscoreObjs(List<HighscoreObj> objs)

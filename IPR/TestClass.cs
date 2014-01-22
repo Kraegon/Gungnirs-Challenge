@@ -11,8 +11,7 @@ namespace IPR
     {
         public async static void TestProcedure()
         {
-            var a = await HighscoreReader.GetHighscoresAsync();
-            var b = await HighscoreReader.SortHighestScoreFirstAsync();
+            await Task.Delay(1);
         }
     }
 }

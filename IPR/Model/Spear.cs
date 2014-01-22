@@ -9,7 +9,7 @@ using Windows.UI.Xaml.Controls;
 
 namespace IPR.Model
 {
-    class Spear
+    public class Spear
     {
         /// <summary>
         /// The weight of the spear for calculations
