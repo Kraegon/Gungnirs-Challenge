@@ -8,6 +8,7 @@ using Bing.Maps;
 using Bing.Maps.Directions;
 //using Windows.UI.Xaml.Controls.Image;
 using Windows.Devices.Geolocation;
+using Windows.Devices.Geolocation.Geofencing;
 using IPR.Model;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
@@ -31,12 +32,33 @@ namespace IPR.Control
         private DirectionsManager DirManager;
         public Geolocator Locator;
 
+
+
         public void Initialize()
         {
             Locator = new Geolocator();
             WaypointCol = new WaypointCollection();
             Locator.DesiredAccuracy = PositionAccuracy.High;
             Locator.PositionChanged += Locator_PositionChanged;
+
+            ClearGeofences();
+            GeofenceMonitor.Current.GeofenceStateChanged += Current_GeofenceStateChanged;
+        }
+
+        private void Current_GeofenceStateChanged(GeofenceMonitor sender, object args)
+        {
+            var reports = sender.ReadReports();
+            foreach (var item in reports)
+            {
+                var state = item.NewState;
+                var fence = item.Geofence;
+
+                if (state == GeofenceState.Entered)
+                {
+                    System.Diagnostics.Debug.WriteLine("Entered the geofence event and state.Entered");
+                    SpearHandler.Gungnir.Available = true;
+                }
+            }
         }
 
         private async void Locator_PositionChanged(Geolocator sender, PositionChangedEventArgs e)
@@ -83,35 +105,92 @@ namespace IPR.Control
         /// <summary>
         /// Draws the walkable route to the spear, if the spear is unavailable
         /// </summary>
-/*        private async void DrawRouteToSpear()
+        public async void DrawWalkableRouteToSpear(Location playerLocation, Location spearLocation)
         {
-            if (GodController.CurrentSpear.Available)
+            if (SpearHandler.Gungnir.Available)
                 return;
+            DirManager.Waypoints.Clear();
 
-            if (DirManager.Waypoints.Count > 1)
+            DirManager.Waypoints.Add(new Waypoint(playerLocation));
+            DirManager.Waypoints.Add(new Waypoint(spearLocation));
+
+
+            DirManager.RequestOptions.RouteMode = RouteModeOption.Walking;
+            DirManager.RequestOptions.Optimize = OptimizeOption.Walking;
+            
+            //Do something with the distance?
+            var distance = DirManager.RequestOptions.DistanceUnit;
+            
+            RouteResponse response = await DirManager.CalculateDirectionsAsync();
+            if (response.HasError)
+                await GodController.ShowMessageAsync("Route error", "The route could not be calculated.");
+
+            DirManager.ShowRoutePath(DirManager.ActiveRoute);
+        } 
+
+        public static void DrawThrownRoute()
+        {
+            try
             {
-                DirectionsManager manager = DirManager;
-                manager.Waypoints = DirManager.Waypoints;
-                RouteResponse response = await manager.CalculateDirectionsAsync();
+                MapPolyline routeLine = new MapPolyline();
+                routeLine.Locations = new LocationCollection();
+                routeLine.Color = Windows.UI.Colors.Red;
+                routeLine.Width = 5.0;
 
-                manager.RequestOptions.RouteMode = RouteModeOption.Walking;
-
-                //not sure if usefull or not
-                //var distance = manager.RequestOptions.DistanceUnit;
-
-                manager.ShowRoutePath(manager.ActiveRoute);
+                routeLine.Locations.Add(new Location
+                {
+                    Latitude = GodController.CurrentPlayer.Location.Latitude,
+                    Longitude = GodController.CurrentPlayer.Location.Longitude
+                });
+                routeLine.Locations.Add(new Location
+                {
+                    Latitude = SpearHandler.Gungnir.Location.Latitude,
+                    Longitude = SpearHandler.Gungnir.Location.Longitude
+                });
+                MapShapeLayer shapeLayer = new MapShapeLayer();
+                shapeLayer.Shapes.Add(routeLine);
+//                Map.ShapeLayers.Add(shapeLayer);
             }
-        } */
+            catch
+            {
+                //Message dialog, description + Title
+                GodController.ShowMessage("Something went wrong with drawing the route to the spear.", "Error");
+            }
+        }
+
+        /// <summary>
+        /// Adds a Geofence to the location of the spear
+        /// </summary>
+        /// <param name="spearLocation"></param>
+        private void AddGeofence(Location spearLocation)
+        {
+            // Especially for Julian FLOAT!
+            Geofence spearFence = new Geofence(
+                "SpearLocation" + DateTime.Now.ToString(),
+                new Geocircle(new BasicGeoposition { Latitude = spearLocation.Latitude, Longitude = spearLocation.Longitude }, (double)20.0f),
+                MonitoredGeofenceStates.Entered,
+                true,
+                TimeSpan.FromSeconds(2)); 
+        }
 
         public void ClearMap()
         {
             if (Map.Children.Count > 0)
-            {
                 Map.Children.Clear();
-            }
         }
 
-        void Map_DoubleTapped(object sender, Windows.UI.Xaml.Input.DoubleTappedRoutedEventArgs e)
+        public void ClearGeofences()
+        {
+            if (GeofenceMonitor.Current.Geofences.Count > 0)
+                GeofenceMonitor.Current.Geofences.Clear();
+        }
+        
+        /// <summary>
+        /// Overrides the doubleTap on bing maps
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Map_DoubleTapped(object sender, Windows.UI.Xaml.Input.DoubleTappedRoutedEventArgs e)
         {
             var position = e.GetPosition(Map);
             Location loc;
