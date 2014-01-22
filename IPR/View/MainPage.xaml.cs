@@ -60,14 +60,29 @@ namespace IPR
             HighscoreBox.ItemsSource = DisplayedHighscores;
         }
 
-        private async void BingMap_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+        public async void RefreshScore()
         {
-            await dispatcher.RunAsync(CoreDispatcherPriority.Normal, DrawElements);
+            await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                DrawElements();
+                if (!SpearHandler.Gungnir.Available)
+                    YourDistanceBlock.Text = String.Empty + 10.0; //TODO: Turn into distance thrown.
+                if (SpearHandler.State == GameState.Retrieving)
+                    YourTimeBlock.Text = TimeSpan.Parse("10:00").ToString(); //TODO: Turn into time taken so far.
+                //if (Condition for button)
+                SaveButton.IsEnabled = false;
+                DrawElements();
+            });
         }
 
-        private async void Locator_PositionChanged(Windows.Devices.Geolocation.Geolocator sender, Windows.Devices.Geolocation.PositionChangedEventArgs args)
+        private void BingMap_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
         {
-            await dispatcher.RunAsync(CoreDispatcherPriority.Normal, DrawElements);
+            RefreshScore();
+        }
+
+        private void Locator_PositionChanged(Windows.Devices.Geolocation.Geolocator sender, Windows.Devices.Geolocation.PositionChangedEventArgs args)
+        {
+            RefreshScore();
         }
 
         public Map GetMapObject()
@@ -124,6 +139,11 @@ namespace IPR
                 BingMap.Children.RemoveAt(1);
             }
             
+        }
+
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        {
+            HighscoreReader.
         }
     }
 }

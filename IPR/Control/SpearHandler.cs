@@ -20,7 +20,7 @@ namespace IPR.Control
     /// </summary>
     public class SpearHandler
     {
-        public static Spear Gungnir;
+        public static Spear Gungnir = new Spear();
         public static GameState State;
         
         /// <summary>
