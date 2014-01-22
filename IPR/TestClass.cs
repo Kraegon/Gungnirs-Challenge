@@ -12,9 +12,6 @@ namespace IPR
         public async static void TestProcedure()
         {
             await Task.Delay(1);
-//            SpearHandler.LetsThrow();
-//            SpearHandler.Gungnir.Location = new Bing.Maps.Location(51.3511, 4.4633);
-
         }
     }
 }

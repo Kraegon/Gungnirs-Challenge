@@ -26,9 +26,38 @@ namespace IPR.Control
             return angle;
         }
 
+        public static double Pythagoras(double aa, double bb)
+        {
+            double cc = (aa * aa) + (bb * bb);
+            return Math.Sqrt(cc);
+        }
+        public static double Delta(double aa, double bb)
+        {
+            return bb - aa; 
+        }
+        /// <summary>
+        /// From the pneumonic SOHCAHTOA
+        /// From two points the Opposite divided by Hypoteneuse.
+        /// </summary>
+        /// <param name="locA">Point 1</param>
+        /// <param name="locB">Point 2</param>
+        /// <returns>Angle of </returns>
+        public static double SOH(Location locA, Location locB)
+        {
+            double o = DegreesToRadian(Delta(locA.Latitude, locB.Latitude));
+            double h = DegreesToRadian(Pythagoras(Delta(locA.Latitude, locB.Latitude), Delta(locA.Longitude, locB.Longitude)));
+            return Math.Sin(o / h);
+        }
+        public static double CAH(Location locA, Location locB)
+        {
+            double a = DegreesToRadian(Delta(locA.Longitude, locB.Longitude));
+            double h = DegreesToRadian(Pythagoras(Delta(locA.Latitude, locB.Latitude), Delta(locA.Longitude, locB.Longitude)));
+            return Math.Cos(a / h);
+        }
+
         public static int CalculateDistance(int Power)
         {
-            return Power / 10;
+            return Power;
         }
 
         public static double DegreesToRadian(double angle)

@@ -45,20 +45,23 @@ namespace IPR.Control
             GeofenceMonitor.Current.GeofenceStateChanged += Current_GeofenceStateChanged;
         }
 
-        private void Current_GeofenceStateChanged(GeofenceMonitor sender, object args)
+        private async void Current_GeofenceStateChanged(GeofenceMonitor sender, object e)
         {
-            var reports = sender.ReadReports();
-            foreach (var item in reports)
-            {
-                var state = item.NewState;
-                var fence = item.Geofence;
-
-                if (state == GeofenceState.Entered)
+            System.Diagnostics.Debug.WriteLine("Entered geofence");
+            var reports = sender.ReadReports();         
+            await MainPage.dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                 {
-                    System.Diagnostics.Debug.WriteLine("Entered the geofence event and state.Entered");
-                    SpearHandler.Gungnir.Available = true;
-                }
-            }
+                    foreach (var item in reports)
+                    {
+                        var state = item.NewState;
+
+                        if (state == GeofenceState.Entered)
+                        {
+                            System.Diagnostics.Debug.WriteLine("Entered the geofence event and state.Entered");
+                            SpearHandler.Gungnir.Available = true;
+                        }
+                    }
+                });
         }
 
         private async void Locator_PositionChanged(Geolocator sender, PositionChangedEventArgs e)
@@ -109,6 +112,8 @@ namespace IPR.Control
         {
             if (SpearHandler.Gungnir.Available)
                 return;
+            if (DirManager == null)
+                DirManager = Map.DirectionsManager;
             DirManager.Waypoints.Clear();
 
             DirManager.Waypoints.Add(new Waypoint(playerLocation));
@@ -167,7 +172,7 @@ namespace IPR.Control
             // Especially for Julian FLOAT!
             Geofence spearFence = new Geofence(
                 "SpearLocation" + DateTime.Now.ToString(),
-                new Geocircle(new BasicGeoposition { Latitude = spearLocation.Latitude, Longitude = spearLocation.Longitude }, (double)20.0f),
+                new Geocircle(new BasicGeoposition { Latitude = spearLocation.Latitude, Longitude = spearLocation.Longitude }, (double)30.0f),
                 MonitoredGeofenceStates.Entered,
                 true,
                 TimeSpan.FromSeconds(2)); 
@@ -197,9 +202,10 @@ namespace IPR.Control
             Map.TryPixelToLocation(position, out loc);
 
             GodController.DirectionLocation = loc;
+            
+            if(SpearHandler.State == GameState.Idle)
+                SpearHandler.StartThrow();
 
-            SpearHandler.LetsThrow();
-            DrawWalkableRouteToSpear(GodController.CurrentPlayer.Location, SpearHandler.Gungnir.Location);
         }
     }
 }
