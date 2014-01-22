@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.Devices.Geolocation;
 using Bing.Maps;
-using IPR.Model;
 
 namespace IPR.Control
 {
@@ -53,7 +52,8 @@ namespace IPR.Control
                     UpdateGameStateEvent();
                     break;
                 case GameState.SpearThrowing:
-                    await ThrowSpear(throwPower);
+                    ThrowSpear(throwPower);
+                    Gungnir.Available = false;
                     break;
                 case GameState.RouteDrawing:
                     DrawRoute();
@@ -79,14 +79,13 @@ namespace IPR.Control
 
         public static int DeterminePower()
         {
-            int retVal = 100;
+            int retVal = 10;
             return retVal;
         }
 
-        public static async Task ThrowSpear(int power)
+        public static async void ThrowSpear(int power)
         {
             int Pow = MathCalculation.CalculateDistance(power);
-
             if (GodController.DirectionLocation == null || Gungnir == null)
                 return;
             Gungnir.Location = GodController.CurrentPlayer.Location;
@@ -96,71 +95,40 @@ namespace IPR.Control
 
         private async static Task updateSpearLocation()
         {
-            /*
-            if((GodController.CurrentPlayer.Location.Latitude > GodController.DirectionLocation.Latitude)
-                && (GodController.CurrentPlayer.Location.Longitude > GodController.DirectionLocation.Longitude))
-            {
-                Gungnir.Location = new Location(
-                Gungnir.Location.Latitude - 0.0001 * ((Math.PI) * MathCalculation.SOH(GodController.CurrentPlayer.Location, GodController.DirectionLocation)),
-                Gungnir.Location.Longitude - 0.0001 * ((Math.PI) * MathCalculation.CAH(GodController.CurrentPlayer.Location, GodController.DirectionLocation))
-                );
-            }
-            else if ((GodController.CurrentPlayer.Location.Latitude < GodController.DirectionLocation.Latitude)
-              && (GodController.CurrentPlayer.Location.Longitude > GodController.DirectionLocation.Longitude))
-            {
-                Gungnir.Location = new Location(
-                Gungnir.Location.Latitude + 0.0001 * ((Math.PI) * MathCalculation.SOH(GodController.CurrentPlayer.Location, GodController.DirectionLocation)),
-                Gungnir.Location.Longitude - 0.0001 * ((Math.PI) * MathCalculation.CAH(GodController.CurrentPlayer.Location, GodController.DirectionLocation))
-                );
-            }
-            else if ((GodController.CurrentPlayer.Location.Latitude > GodController.DirectionLocation.Latitude)
-              && (GodController.CurrentPlayer.Location.Longitude < GodController.DirectionLocation.Longitude))
-            {
-                Gungnir.Location = new Location(
-                Gungnir.Location.Latitude - 0.0001 * ((Math.PI) * MathCalculation.SOH(GodController.CurrentPlayer.Location, GodController.DirectionLocation)),
-                Gungnir.Location.Longitude + 0.0001 * ((Math.PI) * MathCalculation.CAH(GodController.CurrentPlayer.Location, GodController.DirectionLocation))
-                );
-            }
-            else
-            {
-                Gungnir.Location = new Location(
-                Gungnir.Location.Latitude + 0.0001 * ((Math.PI) * MathCalculation.SOH(GodController.CurrentPlayer.Location, GodController.DirectionLocation)),
-                Gungnir.Location.Longitude + 0.0001 * ((Math.PI) * MathCalculation.CAH(GodController.CurrentPlayer.Location, GodController.DirectionLocation))
-                );
-            }*/
             double a = MathCalculation.Delta(GodController.CurrentPlayer.Location.Longitude, GodController.DirectionLocation.Longitude) /
                        MathCalculation.Delta(GodController.CurrentPlayer.Location.Latitude, GodController.DirectionLocation.Latitude);
             double b = GodController.CurrentPlayer.Location.Longitude - (a * GodController.CurrentPlayer.Location.Latitude);
             if (GodController.CurrentPlayer.Location.Latitude < GodController.DirectionLocation.Latitude)
             {
-                for (double x = 0; x < 0.01; x += 0.0001)
+                for (double x = 0; x < (0.1 / throwPower); x += 0.0001)
                 {
                     Gungnir.Location = new Location(
                         GodController.CurrentPlayer.Location.Latitude + x,
                         (a * (GodController.CurrentPlayer.Location.Latitude + x)) + b
                     );
-                    await Task.Delay(10);
+                    await Task.Delay(200);
                     SpearLocationUpdateEvent();
                 }
             }
             else
             {
-                for (double x = 0; x > -0.01; x -= 0.0001)
+                for (double x = 0; x > (-0.1 / throwPower); x -= 0.0001)
                 {
                     Gungnir.Location = new Location(
                         GodController.CurrentPlayer.Location.Latitude + x,
                         (a * (GodController.CurrentPlayer.Location.Latitude + x)) + b
                     );
-                    await Task.Delay(10);
+                    await Task.Delay(200);
                     SpearLocationUpdateEvent();
                 }
             }
-            
+            return;
         }
 
         public static void DrawRoute()
         {
             //Relay the command to draw the route to Gungnir
+            GodController.HandleMap.DrawWalkableRouteToSpear(GodController.CurrentPlayer.Location, Gungnir.Location);
             UpdateGameStateEvent();
         }
 

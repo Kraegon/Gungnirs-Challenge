@@ -17,6 +17,7 @@ using Windows.UI.Xaml.Navigation;
 using Bing.Maps;
 using Windows.UI.Core;
 using IPR.Model;
+using Windows.UI.Xaml.Media.Imaging;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -37,7 +38,7 @@ namespace IPR
         {
             this.InitializeComponent();
             dispatcher = this.Dispatcher;
-            /* Initalizes the controllers and adds the map to the maphandler */
+            /* Initalises the controllers and adds the map to the maphandler */
             GodController.HandleMap.SetMap(BingMap);
             GodController.HandleMap.Initialize();
             GodController.HandleMap.Locator.PositionChanged += Locator_PositionChanged;
@@ -68,7 +69,7 @@ namespace IPR
             HighscoreBox.ItemsSource = DisplayedHighscores;
         }
 
-        public async void RefreshScore()
+        public async void Refresh()
         {
             await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
@@ -77,6 +78,17 @@ namespace IPR
                     YourDistanceBlock.Text = String.Empty + 10.0; //TODO: Turn into distance thrown.
                 if (SpearHandler.State == GameState.Retrieving)
                     YourTimeBlock.Text = TimeSpan.Parse("10:00").ToString(); //TODO: Turn into time taken so far.
+                if ((SpearHandler.Gungnir == null) || SpearHandler.Gungnir.Available)
+                {
+                    SpearAvailableBlock.Text = "Available";
+                    SpearAvailableBlock.Foreground = new SolidColorBrush(Windows.UI.Colors.Green);
+                }
+                else
+                {
+
+                    SpearAvailableBlock.Text = "Not available";
+                    SpearAvailableBlock.Foreground = new SolidColorBrush(Windows.UI.Colors.Red);
+                }
                 //if (Condition for button)
                 SaveButton.IsEnabled = false;
                 DrawElements();
@@ -85,12 +97,12 @@ namespace IPR
 
         private void BingMap_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
         {
-            RefreshScore();
+            Refresh();
         }
 
         private void Locator_PositionChanged(Windows.Devices.Geolocation.Geolocator sender, Windows.Devices.Geolocation.PositionChangedEventArgs args)
         {
-            RefreshScore();
+            Refresh();
         }
 
         public Map GetMapObject()
@@ -102,11 +114,6 @@ namespace IPR
         {
             //Clear pins
             GodController.HandleMap.ClearMap();
-            //Set view
-            if(BingMap.ZoomLevel < 13.0f)
-                BingMap.SetView(GodController.CurrentPlayer.Location, 13.0f);
-            else
-                BingMap.SetView(GodController.CurrentPlayer.Location, BingMap.ZoomLevel);
             //Player pin
             if (GodController.CurrentPlayer != null)
             {
@@ -116,6 +123,11 @@ namespace IPR
                 };
                 BingMap.Children.Add(pin);
                 MapLayer.SetPosition(pin, GodController.CurrentPlayer.Location);
+                //Set view
+                if (BingMap.ZoomLevel < 15.0f)
+                    BingMap.SetView(GodController.CurrentPlayer.Location, 15.0f);
+                else
+                    BingMap.SetView(GodController.CurrentPlayer.Location, BingMap.ZoomLevel);
             }
             //Direction pin
             if (GodController.DirectionLocation != null)
@@ -129,7 +141,7 @@ namespace IPR
                 MapLayer.SetPosition(pin, GodController.DirectionLocation);
             }
             //Spear (if available)
-            if ((SpearHandler.Gungnir != null) && SpearHandler.Gungnir.Available && SpearHandler.Gungnir.Location != null)
+            if ((SpearHandler.Gungnir != null) && SpearHandler.Gungnir.Location != null)
             {
                 Pushpin pin = new Pushpin()
                 {
@@ -138,7 +150,13 @@ namespace IPR
                 pin.Background = new SolidColorBrush(Windows.UI.Color.FromArgb(255,125,125,0));
                 BingMap.Children.Add(pin);
                 MapLayer.SetPosition(pin, SpearHandler.Gungnir.Location);
+                //Set view
+                if (BingMap.ZoomLevel < 15.0f)
+                    BingMap.SetView(SpearHandler.Gungnir.Location, 15.0f);
+                else
+                    BingMap.SetView(SpearHandler.Gungnir.Location, BingMap.ZoomLevel);
             }
+             
         }
 
         private void MapTapEvent(object sender, RoutedEventArgs e)
