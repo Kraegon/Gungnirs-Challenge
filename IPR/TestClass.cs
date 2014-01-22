@@ -11,8 +11,7 @@ namespace IPR
     {
         public async static void TestProcedure()
         {
-            await Task.Delay(10000);
-            await HighscoreReader.SaveHighscoreObj(new Model.HighscoreObj("DDD", 2000, TimeSpan.Parse("00:30")));            
+            await Task.Delay(1);
         }
     }
 }
