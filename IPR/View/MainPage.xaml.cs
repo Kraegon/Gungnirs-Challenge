@@ -39,9 +39,9 @@ namespace IPR
             this.InitializeComponent();
             dispatcher = this.Dispatcher;
             /* Initalises the controllers and adds the map to the maphandler */
-            GodController.HandleMap.SetMap(BingMap);
-            GodController.HandleMap.Initialize();
-            GodController.HandleMap.Locator.PositionChanged += Locator_PositionChanged;
+            SatanController.HandleMap.SetMap(BingMap);
+            SatanController.HandleMap.Initialize();
+            SatanController.HandleMap.Locator.PositionChanged += Locator_PositionChanged;
             BingMap.DoubleTappedOverride += BingMap_DoubleTapped;
             /* Initialise the highscores and databinding to it */
             HighscoreInit();
@@ -113,24 +113,24 @@ namespace IPR
         public void DrawElements()
         {
             //Clear pins
-            GodController.HandleMap.ClearMap();
+            SatanController.HandleMap.ClearMap();
             //Player pin
-            if (GodController.CurrentPlayer != null)
+            if (SatanController.CurrentPlayer != null)
             {
                 Pushpin pin = new Pushpin()
                 {
                     Text = "Me"
                 };
                 BingMap.Children.Add(pin);
-                MapLayer.SetPosition(pin, GodController.CurrentPlayer.Location);
+                MapLayer.SetPosition(pin, SatanController.CurrentPlayer.Location);
                 //Set view
                 if (BingMap.ZoomLevel < 15.0f)
-                    BingMap.SetView(GodController.CurrentPlayer.Location, 15.0f);
+                    BingMap.SetView(SatanController.CurrentPlayer.Location, 15.0f);
                 else
-                    BingMap.SetView(GodController.CurrentPlayer.Location, BingMap.ZoomLevel);
+                    BingMap.SetView(SatanController.CurrentPlayer.Location, BingMap.ZoomLevel);
             }
             //Direction pin
-            if (GodController.DirectionLocation != null)
+            if (SatanController.DirectionLocation != null)
             {
                 Pushpin pin = new Pushpin
                 {
@@ -138,7 +138,7 @@ namespace IPR
                 };
                 pin.Background = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 0, 0, 255));
                 BingMap.Children.Add(pin);
-                MapLayer.SetPosition(pin, GodController.DirectionLocation);
+                MapLayer.SetPosition(pin, SatanController.DirectionLocation);
             }
             //Spear (if available)
             if ((SpearHandler.Gungnir != null) && SpearHandler.Gungnir.Location != null)

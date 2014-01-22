@@ -9,7 +9,7 @@ using Bing.Maps;
 
 namespace IPR.Control
 {
-    class GodController
+    class SatanController
     {
         public static Player CurrentPlayer { get; set; }
         public static Location DirectionLocation { get; set; }

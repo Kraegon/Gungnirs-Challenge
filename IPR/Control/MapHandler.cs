@@ -68,10 +68,10 @@ namespace IPR.Control
         {
             await MainPage.dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
-                if (GodController.CurrentPlayer == null)
+                if (SatanController.CurrentPlayer == null)
                     //return;
-                    GodController.CurrentPlayer = new Player();
-                GodController.CurrentPlayer.Location = new Location(e.Position.Coordinate.Point.Position.Latitude,
+                    SatanController.CurrentPlayer = new Player();
+                SatanController.CurrentPlayer.Location = new Location(e.Position.Coordinate.Point.Position.Latitude,
                                                       e.Position.Coordinate.Point.Position.Longitude);
             });
         }
@@ -93,7 +93,7 @@ namespace IPR.Control
         /// <param name="player"></param>
         public void SetPlayer(Player player)
         {
-            GodController.CurrentPlayer = player;
+            SatanController.CurrentPlayer = player;
         }
 
         /// <summary>
@@ -128,7 +128,7 @@ namespace IPR.Control
             
             RouteResponse response = await DirManager.CalculateDirectionsAsync();
             if (response.HasError)
-                await GodController.ShowMessageAsync("Route error", "The route could not be calculated.");
+                await SatanController.ShowMessageAsync("Route error", "The route could not be calculated.");
 
             DirManager.ShowRoutePath(DirManager.ActiveRoute);
         } 
@@ -144,8 +144,8 @@ namespace IPR.Control
 
                 routeLine.Locations.Add(new Location
                 {
-                    Latitude = GodController.CurrentPlayer.Location.Latitude,
-                    Longitude = GodController.CurrentPlayer.Location.Longitude
+                    Latitude = SatanController.CurrentPlayer.Location.Latitude,
+                    Longitude = SatanController.CurrentPlayer.Location.Longitude
                 });
                 routeLine.Locations.Add(new Location
                 {
@@ -159,7 +159,7 @@ namespace IPR.Control
             catch
             {
                 //Message dialog, description + Title
-                GodController.ShowMessage("Something went wrong with drawing the route to the spear.", "Error");
+                SatanController.ShowMessage("Something went wrong with drawing the route to the spear.", "Error");
             }
         }
 
@@ -201,7 +201,7 @@ namespace IPR.Control
             Location loc;
             Map.TryPixelToLocation(position, out loc);
 
-            GodController.DirectionLocation = loc;
+            SatanController.DirectionLocation = loc;
             
             if(SpearHandler.State == GameState.Idle)
                 SpearHandler.StartThrow();

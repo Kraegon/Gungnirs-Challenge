@@ -86,25 +86,25 @@ namespace IPR.Control
         public static async void ThrowSpear(int power)
         {
             int Pow = MathCalculation.CalculateDistance(power);
-            if (GodController.DirectionLocation == null || Gungnir == null)
+            if (SatanController.DirectionLocation == null || Gungnir == null)
                 return;
-            Gungnir.Location = GodController.CurrentPlayer.Location;
+            Gungnir.Location = SatanController.CurrentPlayer.Location;
             await updateSpearLocation();
             UpdateGameStateEvent();
         }
 
         private async static Task updateSpearLocation()
         {
-            double a = MathCalculation.Delta(GodController.CurrentPlayer.Location.Longitude, GodController.DirectionLocation.Longitude) /
-                       MathCalculation.Delta(GodController.CurrentPlayer.Location.Latitude, GodController.DirectionLocation.Latitude);
-            double b = GodController.CurrentPlayer.Location.Longitude - (a * GodController.CurrentPlayer.Location.Latitude);
-            if (GodController.CurrentPlayer.Location.Latitude < GodController.DirectionLocation.Latitude)
+            double a = MathCalculation.Delta(SatanController.CurrentPlayer.Location.Longitude, SatanController.DirectionLocation.Longitude) /
+                       MathCalculation.Delta(SatanController.CurrentPlayer.Location.Latitude, SatanController.DirectionLocation.Latitude);
+            double b = SatanController.CurrentPlayer.Location.Longitude - (a * SatanController.CurrentPlayer.Location.Latitude);
+            if (SatanController.CurrentPlayer.Location.Latitude < SatanController.DirectionLocation.Latitude)
             {
                 for (double x = 0; x < (0.1 / throwPower); x += 0.0001)
                 {
                     Gungnir.Location = new Location(
-                        GodController.CurrentPlayer.Location.Latitude + x,
-                        (a * (GodController.CurrentPlayer.Location.Latitude + x)) + b
+                        SatanController.CurrentPlayer.Location.Latitude + x,
+                        (a * (SatanController.CurrentPlayer.Location.Latitude + x)) + b
                     );
                     await Task.Delay(200);
                     SpearLocationUpdateEvent();
@@ -115,8 +115,8 @@ namespace IPR.Control
                 for (double x = 0; x > (-0.1 / throwPower); x -= 0.0001)
                 {
                     Gungnir.Location = new Location(
-                        GodController.CurrentPlayer.Location.Latitude + x,
-                        (a * (GodController.CurrentPlayer.Location.Latitude + x)) + b
+                        SatanController.CurrentPlayer.Location.Latitude + x,
+                        (a * (SatanController.CurrentPlayer.Location.Latitude + x)) + b
                     );
                     await Task.Delay(200);
                     SpearLocationUpdateEvent();
@@ -128,7 +128,7 @@ namespace IPR.Control
         public static void DrawRoute()
         {
             //Relay the command to draw the route to Gungnir
-            GodController.HandleMap.DrawWalkableRouteToSpear(GodController.CurrentPlayer.Location, Gungnir.Location);
+            SatanController.HandleMap.DrawWalkableRouteToSpear(SatanController.CurrentPlayer.Location, Gungnir.Location);
             UpdateGameStateEvent();
         }
 
