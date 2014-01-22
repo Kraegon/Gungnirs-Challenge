@@ -29,12 +29,7 @@ namespace IPR.Control
         /// Navigates between the waypoints
         /// </summary>
         private DirectionsManager DirManager;
-        public Location DirectionLocation;
         public Geolocator Locator;
-
-        public MapHandler()
-        {
-        }
 
         public void Initialize()
         {
@@ -77,35 +72,6 @@ namespace IPR.Control
         }
 
         /// <summary>
-        /// Adds pushpins and waypoints
-        /// </summary>
-        private void AddPinsAndPoints()
-        {
-            // WaypointsCollection needs to be cleared to get accurate data.
-            WaypointCol.Clear();
-
-            //Order in which they are added is important!
-            //First the player then the spear.
-
-            //PlayerStuff
-            WaypointCol.Add(new Waypoint(GodController.CurrentPlayer.Location));
-            Pushpin PlayerPin = new Pushpin() { Name = GodController.CurrentPlayer.Name };
-            Map.Children.Add(PlayerPin);
-            Map.Children.Add(PlayerPin);
-            MapLayer.SetPosition(PlayerPin, GodController.CurrentPlayer.Location);
-
-            // Spear Stuff
-            Pushpin SpearPin;
-            if (!GodController.CurrentSpear.Available)
-            {
-                WaypointCol.Add(new Waypoint(GodController.CurrentSpear.Location));
-                SpearPin = new Pushpin();
-                Map.Children.Add(SpearPin);
-                MapLayer.SetPosition(SpearPin, GodController.CurrentSpear.Location);
-            }
-        }
-
-        /// <summary>
         /// makes a list of waypoints in the directionsmanager
         /// </summary>
         /// <param name="pointsCollection"></param>
@@ -117,7 +83,7 @@ namespace IPR.Control
         /// <summary>
         /// Draws the walkable route to the spear, if the spear is unavailable
         /// </summary>
-        private async void DrawRouteToSpear()
+/*        private async void DrawRouteToSpear()
         {
             if (GodController.CurrentSpear.Available)
                 return;
@@ -135,43 +101,7 @@ namespace IPR.Control
 
                 manager.ShowRoutePath(manager.ActiveRoute);
             }
-        }
-
-        /// <summary>
-        /// Draws A straight line from the player to the Spear the "Thrown line".
-        /// </summary>
-        private void DrawThrownRoute()
-        {
-
-            if (GodController.CurrentSpear.Available)
-                return;
-            try
-            {
-                MapPolyline routeLine = new MapPolyline();
-                routeLine.Locations = new LocationCollection();
-                routeLine.Color = Windows.UI.Colors.Brown;
-                routeLine.Width = 5.0;
-
-                routeLine.Locations.Add(new Location
-                    {
-                        Latitude = GodController.CurrentPlayer.Location.Latitude,
-                        Longitude = GodController.CurrentPlayer.Location.Longitude
-                    });
-                routeLine.Locations.Add(new Location
-                    {
-                        Latitude = GodController.CurrentSpear.Location.Latitude,
-                        Longitude = GodController.CurrentSpear.Location.Longitude
-                    });
-                MapShapeLayer shapeLayer = new MapShapeLayer();
-                shapeLayer.Shapes.Add(routeLine);
-                Map.ShapeLayers.Add(shapeLayer);
-            }
-            catch
-            {
-                //Message dialog, description + Title
-                GodController.ShowMessage("Something went wrong with drawing the route to the spear.", "Error");
-            }
-        }
+        } */
 
         public void ClearMap()
         {
@@ -181,17 +111,15 @@ namespace IPR.Control
             }
         }
 
-
         void Map_DoubleTapped(object sender, Windows.UI.Xaml.Input.DoubleTappedRoutedEventArgs e)
         {
             var position = e.GetPosition(Map);
             Location loc;
             Map.TryPixelToLocation(position, out loc);
 
-            System.Diagnostics.Debug.WriteLine(MathCalculation.CalculateAngle(GodController.CurrentPlayer.Location, loc ).ToString());
+            GodController.DirectionLocation = loc;
 
-
-            DirectionLocation = loc;
+            SpearHandler.LetsThrow();
         }
     }
 }

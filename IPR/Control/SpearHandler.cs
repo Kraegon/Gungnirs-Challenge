@@ -22,35 +22,69 @@ namespace IPR.Control
     {
         public static Spear Gungnir = new Spear();
         public static GameState State;
+//        System.Threading.Timer timer = new System.Threading.Timer();
+        public delegate void SpearLocationUpdateHandler();
+        public static event SpearLocationUpdateHandler SpearLocationUpdateEvent;
+
         
         /// <summary>
         /// This is the games procedure.
         /// </summary>
         /// <returns> Success </returns>
-        public static bool LetsThrow()
+        public async static void LetsThrow()
         {
+            Gungnir = new Spear
+            {
+                Available = true
+            };
             State = GameState.PowerDetermining;
             int power = DeterminePower();
-            Task.Delay(5000);  // Await Power determining
+            await Task.Delay(5000);  // Await Power determining
+            System.Diagnostics.Debug.WriteLine("SpearThrowing");
             State = GameState.SpearThrowing;
-            Task.Delay(5000);  // Await Spear throwing
+            ThrowSpear(power);
+            await Task.Delay(5000);  // Await Spear throwing
+            System.Diagnostics.Debug.WriteLine("route Drawing");
+
             State = GameState.RouteDrawing;
-            Task.Delay(5000);  // Await route drawing
+            await Task.Delay(5000);  // Await route drawing
+            System.Diagnostics.Debug.WriteLine("Retrieving");
             State = GameState.Retrieving;
-            Task.Delay(5000);  // Await Spear retrieving
+            await Task.Delay(5000);  // Await Spear retrieving
             State = GameState.Idle;
-            return true;
         }
 
         public static int DeterminePower()
         {
-            return 10;
+            return 100;
         }
 
-        public static void ThrowSpear(int Power)
+        public static async void ThrowSpear(int power)
         {
-            //Set the location of TheSpear
-            return;
+            int Pow = MathCalculation.CalculateDistance(power);
+
+            if (GodController.DirectionLocation == null || Gungnir == null)
+                return;
+
+            while(Pow > 0)
+            {
+                updateSpearLocation();
+
+                System.Diagnostics.Debug.WriteLine(Pow.ToString());
+                Pow--;
+                await Task.Delay(100);
+            }
+
+                       
+
+        }
+
+        private static void updateSpearLocation()
+        {
+            Gungnir.Location = new Location(
+                GodController.CurrentPlayer.Location.Longitude + 0.000001 * Math.Cos(GodController.DirectionLocation.Longitude),
+                GodController.CurrentPlayer.Location.Latitude + 0.000001 * Math.Sin(GodController.DirectionLocation.Latitude));
+            SpearLocationUpdateEvent();
         }
 
         public static void DrawRoute()
@@ -68,7 +102,7 @@ namespace IPR.Control
         private void DrawThrownRoute()
         {
 
-            if (GodController.CurrentSpear.Available)
+            if (Gungnir.Available)
                 return;
             try
             {
@@ -84,8 +118,8 @@ namespace IPR.Control
                 });
                 routeLine.Locations.Add(new Location
                 {
-                    Latitude = GodController.CurrentSpear.Location.Latitude,
-                    Longitude = GodController.CurrentSpear.Location.Longitude
+                    Latitude = Gungnir.Location.Latitude,
+                    Longitude = Gungnir.Location.Longitude
                 });
                 MapShapeLayer shapeLayer = new MapShapeLayer();
                 shapeLayer.Shapes.Add(routeLine);

@@ -45,6 +45,14 @@ namespace IPR
             /* Initialise the highscores and databinding to it */
             HighscoreInit();
             HighscoreReader.HighscoreUpdatedEvent += HighscoreReader_HighscoreUpdatedEvent;
+            /* initializes SpearHandler */
+            SpearHandler.SpearLocationUpdateEvent += SpearHandler_SpearLocationUpdateEvent;
+
+        }
+
+        void SpearHandler_SpearLocationUpdateEvent()
+        {
+            DrawElements();
         }
 
         private async void HighscoreReader_HighscoreUpdatedEvent()
@@ -110,24 +118,24 @@ namespace IPR
                 MapLayer.SetPosition(pin, GodController.CurrentPlayer.Location);
             }
             //Direction pin
-            if (GodController.HandleMap.DirectionLocation != null)
+            if (GodController.DirectionLocation != null)
             {
                 Pushpin pin = new Pushpin
                 {
                     Name = "Direction_Pin"
                 };
                 BingMap.Children.Add(pin);
-                MapLayer.SetPosition(pin, GodController.HandleMap.DirectionLocation);
+                MapLayer.SetPosition(pin, GodController.DirectionLocation);
             }
             //Spear (if available)
-            if ((GodController.CurrentSpear != null) && GodController.CurrentSpear.Available)
+            if ((SpearHandler.Gungnir != null) && SpearHandler.Gungnir.Available && SpearHandler.Gungnir.Location != null)
             {
                 Pushpin pin = new Pushpin()
                 {
                     Text = "Spear"
                 };
                 BingMap.Children.Add(pin);
-                MapLayer.SetPosition(pin, GodController.CurrentSpear.Location);
+                MapLayer.SetPosition(pin, SpearHandler.Gungnir.Location);
             }
         }
 

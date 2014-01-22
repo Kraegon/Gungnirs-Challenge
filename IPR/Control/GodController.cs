@@ -5,21 +5,17 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.UI.Popups;
 using IPR.Model;
+using Bing.Maps;
 
 namespace IPR.Control
 {
     class GodController
     {
-        /// <summary>
-        /// The current active spear
-        /// </summary>
-        public static Spear CurrentSpear { get; set; }
-
-        /// <summary>
-        /// The current active player
-        /// </summary>
         public static Player CurrentPlayer { get; set; }
+        public static Location DirectionLocation { get; set; }
         private static MapHandler handleMap;
+
+
         public static MapHandler HandleMap
         {
             get
