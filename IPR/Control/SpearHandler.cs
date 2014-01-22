@@ -75,8 +75,8 @@ namespace IPR.Control
                 await Task.Delay(100);
             }
 
-                       
 
+            Gungnir.Available = false;
         }
 
         private static void updateSpearLocation()
@@ -99,38 +99,7 @@ namespace IPR.Control
             return;
         }
 
-        private void DrawThrownRoute()
-        {
 
-            if (Gungnir.Available)
-                return;
-            try
-            {
-                MapPolyline routeLine = new MapPolyline();
-                routeLine.Locations = new LocationCollection();
-                routeLine.Color = Windows.UI.Colors.Brown;
-                routeLine.Width = 5.0;
-
-                routeLine.Locations.Add(new Location
-                {
-                    Latitude = GodController.CurrentPlayer.Location.Latitude,
-                    Longitude = GodController.CurrentPlayer.Location.Longitude
-                });
-                routeLine.Locations.Add(new Location
-                {
-                    Latitude = Gungnir.Location.Latitude,
-                    Longitude = Gungnir.Location.Longitude
-                });
-                MapShapeLayer shapeLayer = new MapShapeLayer();
-                shapeLayer.Shapes.Add(routeLine);
-//                Map.ShapeLayers.Add(shapeLayer);
-            }
-            catch
-            {
-                //Message dialog, description + Title
-                GodController.ShowMessage("Something went wrong with drawing the route to the spear.", "Error");
-            }
-        }
     }
     /// <summary>
     /// These states determine whats going on
