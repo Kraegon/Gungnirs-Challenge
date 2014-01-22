@@ -12,6 +12,8 @@ namespace IPR
         public async static void TestProcedure()
         {
             await Task.Delay(1);
+            //SpearHandler.LetsThrow();
+
         }
     }
 }

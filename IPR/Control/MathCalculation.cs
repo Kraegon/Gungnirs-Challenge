@@ -15,9 +15,6 @@ namespace IPR.Control
             double dLongitude = (directionPoint.Longitude - location.Longitude);
             double dLatitude = (directionPoint.Latitude - location.Latitude);
 
-//            hoek = o/a 
-
-
             double y = Math.Sin(dLongitude) * Math.Cos(directionPoint.Latitude);
             double x = Math.Cos(location.Latitude) * Math.Sin(directionPoint.Latitude - Math.Sin(location.Latitude * Math.Cos(directionPoint.Latitude * Math.Cos(dLongitude))));
 
@@ -27,6 +24,21 @@ namespace IPR.Control
             angle = 360 - angle;
 
             return angle;
+        }
+
+        public static int CalculateDistance(int Power)
+        {
+            return Power / 10;
+        }
+
+        public static double DegreesToRadian(double angle)
+        {
+            return Math.PI * angle / 180.0;
+        }
+
+        public static double RadianToDegrees(double angle)
+        {
+            return angle * (180.0 / Math.PI);
         }
 
 
