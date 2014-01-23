@@ -214,10 +214,6 @@ namespace IPR.Control
             Map.TryPixelToLocation(position, out loc);
 
             SatanController.DirectionLocation = loc;
-            
-            if((SpearHandler.State == GameState.Idle) && (SatanController.CurrentPlayer != null))
-                SpearHandler.StartThrow();
-
         }
     }
 }

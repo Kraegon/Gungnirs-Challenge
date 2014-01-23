@@ -123,6 +123,8 @@
     <Compile Include="Control\MapHandler.cs" />
     <Compile Include="Control\MathCalculation.cs" />
     <Compile Include="Control\SpearHandler.cs" />
+    <Compile Include="Control\WiiRemote\WiiMoteDataContainer.cs" />
+    <Compile Include="Control\WiiRemote\WiiMoteManager.cs" />
     <Compile Include="View\HelpFlyout.xaml.cs">
       <DependentUpon>HelpFlyout.xaml</DependentUpon>
     </Compile>

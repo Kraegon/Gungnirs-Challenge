@@ -40,33 +40,36 @@ namespace IPR.Control
         /// <returns> Success </returns>
         public static void ExecuteStateOperation()
         {
-            if (Gungnir == null)
+            MainPage.dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
-                Gungnir = new Spear
+                if (Gungnir == null)
                 {
-                    Available = true
-                };
-            }
-            if (State > GameState.Retrieving)
-                State = GameState.Idle;
-            switch (State)
-            {
-                case GameState.PowerDetermining:
-                    throwPower = DeterminePower();
-                    UpdateGameStateEvent();
-                    break;
-                case GameState.SpearThrowing:
-                    Gungnir.Available = false;
-                    ThrowSpear(throwPower);
-                    break;
-                case GameState.RouteDrawing:
-                    DrawRoute();
-                    break;
-                case GameState.Retrieving:
-                    RetrieveSpear();
-                    StartTimeRecord();
-                    break;
-            }
+                    Gungnir = new Spear
+                    {
+                        Available = true
+                    };
+                }
+                if (State > GameState.Retrieving)
+                    State = GameState.Idle;
+                switch (State)
+                {
+                    case GameState.PowerDetermining:
+                        throwPower = DeterminePower();
+                        UpdateGameStateEvent();
+                        break;
+                    case GameState.SpearThrowing:
+                        Gungnir.Available = false;
+                        ThrowSpear(throwPower);
+                        break;
+                    case GameState.RouteDrawing:
+                        DrawRoute();
+                        break;
+                    case GameState.Retrieving:
+                        RetrieveSpear();
+                        StartTimeRecord();
+                        break;
+                }
+            });
         }
 
         public static void PropertyChanged()

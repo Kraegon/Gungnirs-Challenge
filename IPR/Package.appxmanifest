@@ -23,5 +23,11 @@
   <Capabilities>
     <Capability Name="internetClient" />
     <DeviceCapability Name="location" />
+    <m2:DeviceCapability Name="humaninterfacedevice">
+      <!--This is the wiimote-->
+      <m2:Device Id="vidpid:057e 0306">
+        <m2:Function Type="usage:0001 0005"/>
+      </m2:Device>
+    </m2:DeviceCapability>
   </Capabilities>
 </Package>

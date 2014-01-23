@@ -42,7 +42,7 @@ namespace IPR
         /// will be used such as when the application is launched to open a specific file.
         /// </summary>
         /// <param name="e">Details about the launch request and process.</param>
-        protected override void OnLaunched(LaunchActivatedEventArgs e)
+        protected async override void OnLaunched(LaunchActivatedEventArgs e)
         {
 
 #if DEBUG
@@ -77,6 +77,8 @@ namespace IPR
             }
             // Ensure the current window is active
             Window.Current.Activate();
+            //Instantiate Wiimote singleton
+            await IPR.Control.WiiMoteControl.WiiMoteManager.INSTANCE.ConnectionInitAsync();
         }
 
         /// <summary>
@@ -109,21 +111,16 @@ namespace IPR
 
         private void OnCommandsRequested(SettingsPane sender, SettingsPaneCommandsRequestedEventArgs args)
         {
-
+            HelpFlyout helpFlyout = new HelpFlyout();
             args.Request.ApplicationCommands.Add(new SettingsCommand(
                 "Reset highscores", "Reset highscores", (handler) => clearHighscore()));
             args.Request.ApplicationCommands.Add(new SettingsCommand(
-                "Help", "Help", (handler) => displayHelpFlyout()));
+                "Tutorial", "Help", (handler) => helpFlyout.Show()));
         }
 
         private void clearHighscore()
         {
             IPR.Control.HighscoreReader.ClearHighscores();
-        }
-
-        private void displayHelpFlyout()
-        {
-
         }
     }
 }
