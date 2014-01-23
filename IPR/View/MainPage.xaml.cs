@@ -37,6 +37,7 @@ namespace IPR
         public MainPage()
         {
             this.InitializeComponent();
+
             dispatcher = this.Dispatcher;
             /* Initalises the controllers and adds the map to the maphandler */
             SatanController.HandleMap.SetMap(BingMap);
@@ -58,15 +59,29 @@ namespace IPR
 
         private async void HighscoreReader_HighscoreUpdatedEvent()
         {
-            DisplayedHighscores = await HighscoreReader.SortHighestScoreFirst(await HighscoreReader.GetHighscoresAsync());
-            HighscoreBox.ItemsSource = null;
-            HighscoreBox.ItemsSource = DisplayedHighscores;
+            try
+            {
+                DisplayedHighscores = await HighscoreReader.SortHighestScoreFirst(await HighscoreReader.GetHighscoresAsync());
+                HighscoreBox.ItemsSource = null;
+                HighscoreBox.ItemsSource = DisplayedHighscores;
+            }
+            catch (ArgumentNullException)
+            {
+                HighscoreReader_HighscoreUpdatedEvent();
+            }
         }
         private async void HighscoreInit()
         {
-            DisplayedHighscores = await HighscoreReader.SortHighestScoreFirst(await HighscoreReader.GetHighscoresAsync());
-            HighscoreBox.ItemTemplate = Resources["HighscoreTemplate"] as DataTemplate;
-            HighscoreBox.ItemsSource = DisplayedHighscores;
+            try
+            {
+                DisplayedHighscores = await HighscoreReader.SortHighestScoreFirst(await HighscoreReader.GetHighscoresAsync());
+                HighscoreBox.ItemTemplate = Resources["HighscoreTemplate"] as DataTemplate;
+                HighscoreBox.ItemsSource = DisplayedHighscores;
+            }
+            catch (ArgumentNullException)
+            {
+                HighscoreInit();
+            }
         }
 
         public async void Refresh()
@@ -177,9 +192,16 @@ namespace IPR
                 return;
             }
             SpearHandler.Score.Name = NameTextBox.Text;
-            await HighscoreReader.SaveHighscoreObj(SpearHandler.Score);
+            HighscoreReader.SaveHighscoreObj(SpearHandler.Score);
             SpearHandler.Score = new HighscoreObj();
             SpearHandler.PropertyChanged();
+        }
+
+        private void ResetButton_Click(object sender, RoutedEventArgs e)
+        {
+            SpearHandler.State = GameState.Idle;
+            SpearHandler.Score = new HighscoreObj();
+            SpearHandler.Gungnir.Available = true;
         }
     }
 }

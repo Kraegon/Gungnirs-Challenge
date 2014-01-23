@@ -9,6 +9,7 @@ using Windows.Data.Json;
 using Windows.Storage;
 using System.Xml;
 using Windows.Data.Xml.Dom;
+using System.Xml.Linq;
 
 namespace IPR.Control
 {
@@ -18,8 +19,8 @@ namespace IPR.Control
     class HighscoreReader
     {
         public static StorageFile HighscoreFile;
-
         private static IHighscoreReaderBridge reader = new XMLReader();
+
         public static bool IsInitialised = false;
         public static bool IsFileEmpty = true;
 
@@ -34,16 +35,24 @@ namespace IPR.Control
 
         public async static Task<List<HighscoreObj>> GetHighscoresAsync()
         {
-            return await reader.GetHighscoresAsync();
+            var retVal = await reader.GetHighscoresAsync();
+            return retVal;
         }
 
-        public async static Task SaveHighscoreObj(HighscoreObj obj)
+        public async static void SaveHighscoreObj(HighscoreObj obj)
         {
             await reader.SaveHighscoreObj(obj);
+            //await Task.Delay(500);
             HighscoreUpdatedEvent();
         }
 
-        public async static Task SaveHighscoreObjs(List<HighscoreObj> objs)
+        public async static void ClearHighscores()
+        {
+            await reader.ClearHighscores();
+            HighscoreUpdatedEvent();
+        }
+
+        public async static void SaveHighscoreObjs(List<HighscoreObj> objs)
         {
             await reader.SaveHighscoreObjs(objs);
             HighscoreUpdatedEvent();
@@ -73,6 +82,8 @@ namespace IPR.Control
         Task SaveHighscoreObj(HighscoreObj obj);
 
         Task SaveHighscoreObjs(List<HighscoreObj> objs);
+
+        Task ClearHighscores();
     }
     /// <summary>
     /// Json version
@@ -134,6 +145,10 @@ namespace IPR.Control
             {
                 retVal = new HighscoreObj();
             }
+            catch
+            {
+                return GetHighscoresAsync().Result; 
+            }
             return null;
         }
 
@@ -149,6 +164,12 @@ namespace IPR.Control
         {
             if (!HighscoreReader.IsInitialised)
                 await InitAsync();
+            throw new NotImplementedException();
+        }
+
+
+        public Task ClearHighscores()
+        {
             throw new NotImplementedException();
         }
     }
@@ -213,17 +234,24 @@ namespace IPR.Control
                 await InitAsync();
             if (HighscoreReader.IsFileEmpty)
                 return new List<HighscoreObj>();
-            List<HighscoreObj> retVal = new List<HighscoreObj>();
-            XmlDocument xmlDoc = await XmlDocument.LoadFromFileAsync(HighscoreReader.HighscoreFile);
-            var node = xmlDoc.SelectSingleNode("Highscores");
-            var nodeList = node.ChildNodes;
-            foreach (var e in nodeList)
+            List<HighscoreObj> retVal = new List<HighscoreObj>();           
+            try
             {
-                HighscoreObj highscore = new HighscoreObj();
-                highscore.Name = (string)e.Attributes[0].NodeValue;
-                highscore.Distance = float.Parse((string)e.Attributes[1].NodeValue);
-                highscore.TimeTaken = TimeSpan.Parse((string)e.Attributes[2].NodeValue);
-                retVal.Add(highscore);
+                XmlDocument xmlDoc = await XmlDocument.LoadFromFileAsync(HighscoreReader.HighscoreFile);
+                var node = xmlDoc.SelectSingleNode("Highscores");
+                var nodeList = node.ChildNodes;
+                foreach (var e in nodeList)
+                {
+                    HighscoreObj highscore = new HighscoreObj();
+                    highscore.Name = (string)e.Attributes[0].NodeValue;
+                    highscore.Distance = float.Parse((string)e.Attributes[1].NodeValue);
+                    highscore.TimeTaken = TimeSpan.Parse((string)e.Attributes[2].NodeValue);
+                    retVal.Add(highscore);
+                }
+            }
+            catch (UnauthorizedAccessException)
+            {
+                retVal = null;
             }
             return retVal;
         }
@@ -235,18 +263,19 @@ namespace IPR.Control
             if (HighscoreReader.IsFileEmpty)
             {
                 //Create
-                XmlWriter xmlWriter = XmlWriter.Create(await HighscoreReader.HighscoreFile.OpenStreamForWriteAsync());
-                xmlWriter.WriteStartDocument();
-                xmlWriter.WriteStartElement("Highscores");
-                xmlWriter.WriteStartElement("Highscore");
-                xmlWriter.WriteAttributeString("Name", obj.Name);
-                xmlWriter.WriteAttributeString("Distance", obj.Distance.ToString());
-                xmlWriter.WriteAttributeString("Time", obj.TimeTaken.ToString());
-                xmlWriter.WriteEndElement();
-                xmlWriter.WriteEndElement();
-                xmlWriter.WriteEndDocument();
-                xmlWriter.Flush();
-                xmlWriter.Dispose();
+                using (XmlWriter xmlWriter = XmlWriter.Create(await HighscoreReader.HighscoreFile.OpenStreamForWriteAsync()))
+                {
+                    xmlWriter.WriteStartDocument();
+                    xmlWriter.WriteStartElement("Highscores");
+                    xmlWriter.WriteStartElement("Highscore");
+                    xmlWriter.WriteAttributeString("Name", obj.Name);
+                    xmlWriter.WriteAttributeString("Distance", obj.Distance.ToString());
+                    xmlWriter.WriteAttributeString("Time", obj.TimeTaken.ToString());
+                    xmlWriter.WriteEndElement();
+                    xmlWriter.WriteEndElement();
+                    xmlWriter.WriteEndDocument();
+                    xmlWriter.Flush();
+                }
                 HighscoreReader.IsFileEmpty = false;
             }
             else
@@ -259,9 +288,8 @@ namespace IPR.Control
                 newElement.SetAttribute("Distance", obj.Distance.ToString());
                 newElement.SetAttribute("Time", obj.TimeTaken.ToString());
                 node.AppendChild(newElement);
-                await xmlDoc.SaveToFileAsync(HighscoreReader.HighscoreFile);
+                await xmlDoc.SaveToFileAsync(HighscoreReader.HighscoreFile); 
             }
-
         }
 
         public async Task SaveHighscoreObjs(List<HighscoreObj> objs)
@@ -270,6 +298,12 @@ namespace IPR.Control
             {
                 await SaveHighscoreObj(obj);
             }
+        }
+
+
+        public async Task ClearHighscores()
+        {
+            await HighscoreReader.HighscoreFile.DeleteAsync();
         }
     }
 }

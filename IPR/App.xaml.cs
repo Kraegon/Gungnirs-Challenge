@@ -15,6 +15,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using IPR.Control;
+using Windows.UI.ApplicationSettings;
 
 // The Blank Application template is documented at http://go.microsoft.com/fwlink/?LinkId=234227
 
@@ -76,7 +77,6 @@ namespace IPR
             }
             // Ensure the current window is active
             Window.Current.Activate();
-            TestClass.TestProcedure();
         }
 
         /// <summary>
@@ -102,6 +102,21 @@ namespace IPR
             //TODO: Save application state and stop any background activity
             deferral.Complete();
         }
+        protected override void OnWindowCreated(WindowCreatedEventArgs args)
+        {
+            SettingsPane.GetForCurrentView().CommandsRequested += OnCommandsRequested;
+        }
 
+        private void OnCommandsRequested(SettingsPane sender, SettingsPaneCommandsRequestedEventArgs args)
+        {
+
+            args.Request.ApplicationCommands.Add(new SettingsCommand(
+                "Reset highscores", "Reset highscores", (handler) => ClearHighscore()));
+        }
+
+        public void ClearHighscore()
+        {
+            IPR.Control.HighscoreReader.ClearHighscores();
+        }
     }
 }

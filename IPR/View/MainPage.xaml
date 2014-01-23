@@ -68,8 +68,13 @@
                     </Button>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Grid.Column="0" Grid.Row="3" Height="100" VerticalAlignment="Bottom">
-                    <TextBlock Text="Spear available: " Margin="10,10,0,0" FontSize="21"/>
+                    <TextBlock Text="Spear available: " Margin="10,10,0,10" FontSize="21"/>
                     <TextBlock x:Name="SpearAvailableBlock" Text="Available" Margin="10,10,0,0" FontSize="21" Foreground="Green" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Column="0" Grid.Row="3" Height="100" VerticalAlignment="Bottom">
+                    <Button x:Name="ResetButton" Click="ResetButton_Click" HorizontalAlignment="Center" Margin="10,10,0,-20">
+                        <TextBlock Text="Reset" FontSize="21"/>
+                    </Button>
                 </StackPanel>
             </Grid>
         </Grid>

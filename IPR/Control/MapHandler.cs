@@ -179,7 +179,7 @@ namespace IPR.Control
         {
             Geofence spearFence = new Geofence(
                 "SpearLocation" + DateTime.Now.ToString(),
-                new Geocircle(new BasicGeoposition { Latitude = spearLocation.Latitude, Longitude = spearLocation.Longitude }, (double)30.0f),
+                new Geocircle(new BasicGeoposition { Latitude = spearLocation.Latitude, Longitude = spearLocation.Longitude }, (double)50.0f),
                 MonitoredGeofenceStates.Entered,
                 true,
                 TimeSpan.FromSeconds(2));
