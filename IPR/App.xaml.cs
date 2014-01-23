@@ -111,12 +111,19 @@ namespace IPR
         {
 
             args.Request.ApplicationCommands.Add(new SettingsCommand(
-                "Reset highscores", "Reset highscores", (handler) => ClearHighscore()));
+                "Reset highscores", "Reset highscores", (handler) => clearHighscore()));
+            args.Request.ApplicationCommands.Add(new SettingsCommand(
+                "Help", "Help", (handler) => displayHelpFlyout()));
         }
 
-        public void ClearHighscore()
+        private void clearHighscore()
         {
             IPR.Control.HighscoreReader.ClearHighscores();
+        }
+
+        private void displayHelpFlyout()
+        {
+
         }
     }
 }

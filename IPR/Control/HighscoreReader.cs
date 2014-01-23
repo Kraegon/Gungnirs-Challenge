@@ -42,7 +42,6 @@ namespace IPR.Control
         public async static void SaveHighscoreObj(HighscoreObj obj)
         {
             await reader.SaveHighscoreObj(obj);
-            //await Task.Delay(500);
             HighscoreUpdatedEvent();
         }
 
