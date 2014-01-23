@@ -28,7 +28,12 @@ namespace IPR
         private NavigationHelper navigationHelper;
 
 
+
+        public HelpFlyout HelpFlyout;
+
+
         public List<HighscoreObj> DisplayedHighscores { get; set; }
+
         public NavigationHelper NavigationHelper
         {
             get { return this.navigationHelper; }
@@ -49,6 +54,8 @@ namespace IPR
             HighscoreReader.HighscoreUpdatedEvent += HighscoreReader_HighscoreUpdatedEvent;
             /* initializes SpearHandler */
             SpearHandler.PropertieUpdateEvent += SpearHandler_SpearLocationUpdateEvent;
+
+            HelpFlyout.Show();
 
         }
 

@@ -1,0 +1,34 @@
+﻿<SettingsFlyout
+    x:Class="IPR.HelpFlyout"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:IPR"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    IconSource="Assets/SmallLogo.png"
+    Title="Tutorial"
+    d:DesignWidth="346">
+
+    <!-- This StackPanel acts as a root panel for vertical layout of the content sections -->
+    <StackPanel VerticalAlignment="Stretch" HorizontalAlignment="Stretch" >
+
+        <!-- The StackPanel(s) below define individual content sections -->
+
+        <!-- Content Section 1-->
+        <StackPanel Style="{StaticResource SettingsFlyoutSectionStyle}">
+
+            <!-- Section 1 header -->
+            <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="Comfy Cooperation" />
+            <TextBlock Style="{StaticResource BodyTextBlockStyle}" Margin="0,0,0,25" TextWrapping="Wrap" ScrollViewer.VerticalScrollMode="Enabled">
+                <TextBlock.Text>Welkom gebruiker van Gungnirs challenge, Dit is een sport applicatie ontwikkeld voor Windows 8.1. Het doel van de applicatie is dat je een speer gooit, dit doe je door snel achter elkaar twee keer op de kaart te klikken. Hierdoor zal een pushpin verschijnen en in deze richting zal je de speer uiteindelijk gaan gooien. Vervolgens pak je de wiimote en houd je de "B" knop (aan de onderkant van de wiimote) ingedrukt. Daarna zal je gooien met de wiimote (vergeet niet het veiligheidsbandje aan te doen), als je op het snelste moment de "B" knop loslaat zal de speer gegooid worden. Je kan de speer niet meer gooien eens dat de speer gegooid is. Op de kaart wordt een punt getekend waar de speer zal liggen, als je hier overheen loopt dan pak je de speer op. Je score wordt dan opgeslagen en links in het scherm is je score te zien. De score wordt gesorteerd op de afstand die je de speer hebt gegooid. Als je de speer hebt opgehaald kan je weer opnieuw gooien. (c) Comfy Cooperation.</TextBlock.Text>
+            </TextBlock>
+
+            <!-- Section 1 body -->
+
+        </StackPanel>
+
+        <!-- Define more Content Sections below as necessary -->
+
+    </StackPanel>
+</SettingsFlyout>

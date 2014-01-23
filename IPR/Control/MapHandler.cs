@@ -33,7 +33,6 @@ namespace IPR.Control
         public Geolocator Locator;
 
 
-
         public void Initialize()
         {
             Locator = new Geolocator();
@@ -122,10 +121,14 @@ namespace IPR.Control
             DirManager.RequestOptions.RouteMode = RouteModeOption.Walking;
             DirManager.RequestOptions.Optimize = OptimizeOption.Walking;
             
-            //Do something with the distance?
-            var distance = DirManager.RequestOptions.DistanceUnit;
-            
+            //Do something with the distance
+
             RouteResponse response = await DirManager.CalculateDirectionsAsync();
+            
+           // not sure if merge conflict or not
+            DirManager.RenderOptions.WaypointPushpinOptions.Visible = false;
+
+
             SpearHandler.Score.Distance = response.Routes[0].TravelDistance * 1000;
             SpearHandler.PropertyChanged(); //Manual fuck you to binding.
 

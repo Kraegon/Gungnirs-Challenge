@@ -21,6 +21,7 @@ namespace IPR.Control
     {
         private static Timer scoreTimer;
         private static int throwPower;
+        public static double Distance;
 
         public static HighscoreObj Score = new HighscoreObj();
         public static Spear Gungnir;
