@@ -19,28 +19,40 @@ namespace IPR.Control
     /// </summary>
     public class SpearHandler
     {
+        /// <summary>
+        /// This timer is needed to tick the seconds away.
+        /// </summary>
         private static Timer scoreTimer;
         private static int throwPower;
-        public static double Distance;
 
         public static HighscoreObj Score = new HighscoreObj();
         public static Spear Gungnir;
 
+        /// <summary>
+        /// Shows the state the game is in. Effects behaviour of most modules.
+        /// </summary>
         public static GameState State = GameState.Idle;
-//        System.Threading.Timer timer = new System.Threading.Timer();
-        public delegate void PropertieUpdateHandler();
+        
+        /// <summary>
+        /// Event used when updating a property.
+        /// Using this notifies the GUI thread to refresh.
+        /// INotifyPropertyChanged eluded me.
+        /// </summary>
         public static event PropertieUpdateHandler PropertieUpdateEvent;
-
-        public delegate void UpdateGameStateHandler();
+        public delegate void PropertieUpdateHandler();
+        
+        /// <summary>
+        /// Move game state to the next. Replaced a procedure driven control with event driven.
+        /// </summary>
         public static event UpdateGameStateHandler UpdateGameStateEvent;
+        public delegate void UpdateGameStateHandler();
 
         /// <summary>
         /// This is the games procedure.
         /// </summary>
-        /// <returns> Success </returns>
-        public static void ExecuteStateOperation()
+        public async static void ExecuteStateOperation()
         {
-            MainPage.dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+            await MainPage.dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
                 if (Gungnir == null)
                 {
@@ -128,6 +140,11 @@ namespace IPR.Control
             UpdateGameStateEvent();
         }
 
+        /// <summary>
+        /// Not pretty.
+        /// Not correct.
+        /// Not important.
+        /// </summary>
         private async static Task updateSpearLocation()
         {
             double a = MathCalculation.Delta(SatanController.CurrentPlayer.Location.Longitude, SatanController.DirectionLocation.Longitude) /

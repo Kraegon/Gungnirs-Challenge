@@ -23,16 +23,21 @@ using Windows.UI.Xaml.Media.Imaging;
 
 namespace IPR
 {
+    /// <summary>
+    /// Handles all UI related functionality.
+    /// </summary>
     public sealed partial class MainPage : Page
     {
-        private NavigationHelper navigationHelper;
-
+        /// <summary>
+        /// Binding assistance for highscoresListBox.
+        /// </summary>
         public List<HighscoreObj> DisplayedHighscores { get; set; }
 
-        public NavigationHelper NavigationHelper
-        {
-            get { return this.navigationHelper; }
-        }
+        /// <summary>
+        /// Publicises the dispatcher for use by other threads.
+        /// Windows.UI.Core.CoreDispatcher seemed to not work, no idea why.
+        /// Worked before, honestly.
+        /// </summary>
         public static CoreDispatcher dispatcher;
         public MainPage()
         {
@@ -46,7 +51,7 @@ namespace IPR
             BingMap.DoubleTappedOverride += BingMap_DoubleTapped;
             /* Initialise the highscores and databinding to it */
             HighscoreInit();
-            HighscoreReader.HighscoreUpdatedEvent += HighscoreReader_HighscoreUpdatedEvent;
+            HighscoreIO.HighscoreUpdatedEvent += HighscoreReader_HighscoreUpdatedEvent;
             /* initializes SpearHandler */
             SpearHandler.PropertieUpdateEvent += SpearHandler_SpearLocationUpdateEvent;
 
@@ -61,7 +66,7 @@ namespace IPR
         {
             try
             {
-                DisplayedHighscores = await HighscoreReader.SortHighestScoreFirst(await HighscoreReader.GetHighscoresAsync());
+                DisplayedHighscores = await HighscoreIO.SortHighestScoreFirst(await HighscoreIO.GetHighscoresAsync());
                 HighscoreBox.ItemsSource = null;
                 HighscoreBox.ItemsSource = DisplayedHighscores;
             }
@@ -74,7 +79,7 @@ namespace IPR
         {
             try
             {
-                DisplayedHighscores = await HighscoreReader.SortHighestScoreFirst(await HighscoreReader.GetHighscoresAsync());
+                DisplayedHighscores = await HighscoreIO.SortHighestScoreFirst(await HighscoreIO.GetHighscoresAsync());
                 HighscoreBox.ItemTemplate = Resources["HighscoreTemplate"] as DataTemplate;
                 HighscoreBox.ItemsSource = DisplayedHighscores;
             }
@@ -84,6 +89,9 @@ namespace IPR
             }
         }
 
+        /// <summary>
+        /// Used by events to refresh UI elements with actual information in case these couldn't be bound.
+        /// </summary>
         public async void Refresh()
         {
             await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
@@ -125,6 +133,9 @@ namespace IPR
             return BingMap;
         }
 
+        /// <summary>
+        /// Draw pin elements on the map.
+        /// </summary>
         public void DrawElements()
         {
             //Clear pins
@@ -155,7 +166,7 @@ namespace IPR
                 BingMap.Children.Add(pin);
                 MapLayer.SetPosition(pin, SatanController.DirectionLocation);
             }
-            //Spear (if available)
+            //Spear (if available) also handles focus
             if ((SpearHandler.Gungnir != null) && (!SpearHandler.Gungnir.Available))
             {
                 Pushpin pin = new Pushpin()
@@ -166,10 +177,13 @@ namespace IPR
                 BingMap.Children.Add(pin);
                 MapLayer.SetPosition(pin, SpearHandler.Gungnir.Location);
                 //Set view
-                if (BingMap.ZoomLevel < 15.0f)
-                    BingMap.SetView(SpearHandler.Gungnir.Location, 15.0f);
-                else
-                    BingMap.SetView(SpearHandler.Gungnir.Location, BingMap.ZoomLevel);
+                if (!(SpearHandler.State == GameState.Retrieving))
+                {
+                    if (BingMap.ZoomLevel < 15.0f)
+                        BingMap.SetView(SpearHandler.Gungnir.Location, 15.0f);
+                    else
+                        BingMap.SetView(SpearHandler.Gungnir.Location, BingMap.ZoomLevel);
+                }
             }
              
         }
@@ -192,7 +206,7 @@ namespace IPR
                 return;
             }
             SpearHandler.Score.Name = NameTextBox.Text;
-            HighscoreReader.SaveHighscoreObj(SpearHandler.Score);
+            HighscoreIO.SaveHighscoreObj(SpearHandler.Score);
             SpearHandler.Score = new HighscoreObj();
             SpearHandler.PropertyChanged();
         }
@@ -201,7 +215,20 @@ namespace IPR
         {
             SpearHandler.State = GameState.Idle;
             SpearHandler.Score = new HighscoreObj();
-            SpearHandler.Gungnir.Available = true;
+            SatanController.DirectionLocation = null;
+            try
+            {
+                SpearHandler.Gungnir.Available = true;
+            }
+            catch (NullReferenceException)
+            {/*If it's null it doesn't need resetting.*/}
+            try
+            {
+                SatanController.HandleMap.ClearRoute();
+            }
+            catch (NullReferenceException)
+            {/*Same*/}
+            Refresh();
         }
     }
 }

@@ -7,6 +7,10 @@ using System.Threading.Tasks;
 
 namespace IPR.Model
 {
+    /// <summary>
+    /// Highscore object. 
+    /// Used to keep track of games current values and persistant storage of previos game results.
+    /// </summary>
     public class HighscoreObj
     {
         public string Name { get; set; }

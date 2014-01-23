@@ -9,6 +9,11 @@ using Bing.Maps;
 
 namespace IPR.Control
 {
+    /// <summary>
+    /// Serves (served?) as focal point of the app.
+    /// Would be a lone singleton containing and/or initialising other singleton classes.
+    /// Contains data that isn't bound to any specific element but is used by each module.
+    /// </summary>
     class SatanController
     {
         public static Player CurrentPlayer { get; set; }

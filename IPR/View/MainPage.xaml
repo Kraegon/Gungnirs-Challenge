@@ -16,14 +16,11 @@
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto" />
-                    <ColumnDefinition Width="auto" />
                 </Grid.ColumnDefinitions>
-                <TextBlock x:Name="NameBlock" Text="{Binding Name}" Margin="5,5,5,5" Grid.Row="0" Grid.Column="0"/>
-                <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="0">
+                <TextBlock x:Name="NameBlock" Text="{Binding Name}" Margin="5,5,5,5" FontWeight="Bold" Grid.Row="0" Grid.Column="0"/>
+                <StackPanel Orientation="Horizontal" Grid.Row="1">
                     <TextBlock Text="Distance: " HorizontalAlignment="Left" Margin="5,5,5,5" />
                     <TextBlock x:Name="DistanceBlock" HorizontalAlignment="Right" Text="{Binding Distance}" Margin="5,5,5,5"/>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1">
                     <TextBlock Text="Time: " HorizontalAlignment="Left" Margin="5,5,5,5" />
                     <TextBlock x:Name="TimeBlock" HorizontalAlignment="Right" Text="{Binding TimeTaken}" Margin="5,5,5,5" />
                 </StackPanel>

@@ -68,6 +68,7 @@ namespace IPR
                 if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
                 {
                     //TODO: Load state from previously suspended application
+                    //No previous state set though
                 }
 
                 // Place the frame in the current Window
@@ -102,6 +103,7 @@ namespace IPR
         {
             var deferral = e.SuspendingOperation.GetDeferral();
             //TODO: Save application state and stop any background activity
+            //Idea: Serialise and save the spear location in roaming so you can throw on a computer and walk with your tablet/phone 
             deferral.Complete();
         }
         protected override void OnWindowCreated(WindowCreatedEventArgs args)
@@ -116,11 +118,13 @@ namespace IPR
                 "Reset highscores", "Reset highscores", (handler) => clearHighscore()));
             args.Request.ApplicationCommands.Add(new SettingsCommand(
                 "Tutorial", "Help", (handler) => helpFlyout.Show()));
+            args.Request.ApplicationCommands.Add(new SettingsCommand(
+                "Wiimotes", "Reconnect wiimotes", async (handler) => await IPR.Control.WiiMoteControl.WiiMoteManager.INSTANCE.ConnectionInitAsync()));
         }
 
         private void clearHighscore()
         {
-            IPR.Control.HighscoreReader.ClearHighscores();
+            IPR.Control.HighscoreIO.ClearHighscores();
         }
     }
 }

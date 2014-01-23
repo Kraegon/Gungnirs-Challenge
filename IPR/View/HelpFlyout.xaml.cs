@@ -17,6 +17,9 @@ using Windows.UI.Xaml.Navigation;
 
 namespace IPR
 {
+    /// <summary>
+    /// Flyout with instructions.
+    /// </summary>
     public sealed partial class HelpFlyout : SettingsFlyout
     {
         public HelpFlyout()

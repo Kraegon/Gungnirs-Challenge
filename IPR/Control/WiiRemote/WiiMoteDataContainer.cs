@@ -10,7 +10,10 @@ using System.Runtime.InteropServices.WindowsRuntime;
 
 namespace IPR.Control.WiiMoteControl
 {
-    public class WiiMote : INotifyPropertyChanged
+    /// <summary>
+    /// WiiMote data publically reporting its status. 
+    /// </summary>
+    public class WiiMote
     {
         private HidDevice device;
         public bool isAheld { get; set; }
@@ -22,7 +25,6 @@ namespace IPR.Control.WiiMoteControl
             {
                 if (isAheld == value) return;
                 isAheld = value;
-                OnPropertyChanged("IsAheld");
             }
         }
         public bool IsBheld
@@ -32,11 +34,10 @@ namespace IPR.Control.WiiMoteControl
             {
                 if (isBheld == value) return;
                 isBheld = value;
-                OnPropertyChanged("IsBheld");
             }
         }
         
-
+        //Wiimote's conventional start message
         private ushort prefix = 0xA2;
         public WiiMote(HidDevice device)
         {
@@ -44,6 +45,12 @@ namespace IPR.Control.WiiMoteControl
             device.InputReportReceived += InputEvent;
         }
 
+        /// <summary>
+        /// InputEvents received automatically from the wiiremote.
+        /// Conventionally starts with 0xA1 followed by the ID byte and then the specifics.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
         private void InputEvent(HidDevice sender, HidInputReportReceivedEventArgs args)
         {
             ParseInput(args.Report.Data);         
@@ -102,10 +109,14 @@ namespace IPR.Control.WiiMoteControl
             device.Dispose();
             device = null;
         }
-
+        /// <summary>
+        /// Broken. Due to an unknown glitch in the output report's data cannot operate at all.
+        /// </summary>
+        /// <param name="reportID">One of the Wiimotes known reportID identifiers</param>
+        /// <param name="commands">A list of 1 or more command parameters</param>
+        /// <returns>Succesful or not</returns>
         public async Task<bool> WriteWiiMoteAsync(WiiMoteReportID reportID, WiiMoteCommand[] commands)
         {
-            /*
             //Create report
             HidOutputReport outReport = device.CreateOutputReport();
             //Create data
@@ -129,40 +140,8 @@ namespace IPR.Control.WiiMoteControl
             {
                 System.Diagnostics.Debug.WriteLine("Failed to send report");
                 return false;
-            }*/
-            for (int i = 0; i < 3; i++)
-            {
-                //Create report
-                HidOutputReport outReport = device.CreateOutputReport();
-                //Create data
-                var writer = new DataWriter();
-                for (int j = 0; j < i; j++)
-                {
-                    writer.WriteByte(1);
-                }
-                try
-                {
-                    outReport.Data = writer.DetachBuffer();    
-                    //Send data
-                    uint result = await device.SendOutputReportAsync(outReport);
-
-                    return true;
-                }
-                catch (ArgumentException e)
-                {
-                    System.Diagnostics.Debug.WriteLine(e.Message);
-                    System.Diagnostics.Debug.WriteLine(e.ParamName);
-                    System.Diagnostics.Debug.WriteLine(i + " failed to send report");
-                }
-                await Task.Delay(10);
             }
             return true;
-        }
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void OnPropertyChanged(string propertyName)
-        {
-            if (this.PropertyChanged != null)
-                this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
     }
     public enum WiiMoteCommand : ushort

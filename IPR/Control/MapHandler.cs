@@ -15,6 +15,9 @@ using Windows.UI.Xaml;
 
 namespace IPR.Control
 {
+    /// <summary>
+    /// Handles map related functionality which can run seperately from the UI thread.
+    /// </summary>
     class MapHandler
     {
         /// <summary>
@@ -32,7 +35,9 @@ namespace IPR.Control
         private DirectionsManager DirManager;
         public Geolocator Locator;
 
-
+        /// <summary>
+        /// Set public components
+        /// </summary>
         public void Initialize()
         {
             Locator = new Geolocator();
@@ -43,6 +48,9 @@ namespace IPR.Control
             GeofenceMonitor.Current.GeofenceStateChanged += Current_GeofenceStateChanged;
         }
 
+        /// <summary>
+        /// Protocol on reaching Gungnir
+        /// </summary>
         private async void Current_GeofenceStateChanged(GeofenceMonitor sender, object e)
         {
             System.Diagnostics.Debug.WriteLine("Entered geofence");
@@ -69,7 +77,6 @@ namespace IPR.Control
             await MainPage.dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
                 if (SatanController.CurrentPlayer == null)
-                    //return;
                     SatanController.CurrentPlayer = new Player();
                 SatanController.CurrentPlayer.Location = new Location(e.Position.Coordinate.Point.Position.Latitude,
                                                       e.Position.Coordinate.Point.Position.Longitude);
@@ -87,23 +94,6 @@ namespace IPR.Control
 
         }
 
-        /// <summary>
-        /// Sets the current player
-        /// </summary>
-        /// <param name="player"></param>
-        public void SetPlayer(Player player)
-        {
-            SatanController.CurrentPlayer = player;
-        }
-
-        /// <summary>
-        /// makes a list of waypoints in the directionsmanager
-        /// </summary>
-        /// <param name="pointsCollection"></param>
-        private void AddWaypointsToDirectionsManager(WaypointCollection pointsCollection)
-        {
-            DirManager.Waypoints = pointsCollection;
-        }
 
         /// <summary>
         /// Draws the walkable route to the spear, if the spear is unavailable
@@ -137,13 +127,16 @@ namespace IPR.Control
             DirManager.ShowRoutePath(DirManager.ActiveRoute);
         }
 
-        private void ClearRoute()
+        public void ClearRoute()
         {
             DirManager.RenderOptions.WaypointPushpinOptions.Visible = false;
             DirManager.HideRoutePath(DirManager.ActiveRoute);
             DirManager.ClearActiveRoute();
         }
 
+        /// <summary>
+        /// Show advised route from player's initial location to spear's landing location.
+        /// </summary>
         public static void DrawThrownRoute()
         {
             try
@@ -205,8 +198,6 @@ namespace IPR.Control
         /// <summary>
         /// Overrides the doubleTap on bing maps
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void Map_DoubleTapped(object sender, Windows.UI.Xaml.Input.DoubleTappedRoutedEventArgs e)
         {
             var position = e.GetPosition(Map);

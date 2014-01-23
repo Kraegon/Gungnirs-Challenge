@@ -11,7 +11,7 @@ using System.ComponentModel;
 
 namespace IPR.Control.WiiMoteControl
 {
-    public class WiiMoteManager : INotifyPropertyChanged
+    public class WiiMoteManager
     {
         private static WiiMoteManager instance;
 
@@ -21,23 +21,18 @@ namespace IPR.Control.WiiMoteControl
                     instance = new WiiMoteManager();
                 return instance;}
         }
+        
         private WiiMote[] wiimotes { get; set; }
-        public WiiMote[] Wiimotes 
-        {
-            get { return wiimotes; }
-            set
-            {
-                if (wiimotes == value) return;
-                wiimotes = value;
-                OnPropertyChanged("Wiimotes");
-            }
-        }
-
-        public WiiMoteManager()
-        {
-            ConnectionInitAsync();
-        }
-
+        
+        /// <summary>
+        /// All wiimote devices connected to this computer.
+        /// Only the first is actively interfaced with.
+        /// </summary>
+        public WiiMote[] Wiimotes{ get; set; }
+        /// <summary>
+        /// Attempts connection to all wiimotes connected via bluetooth.
+        /// </summary>
+        /// <returns>True if more than 1 wiimote was connected</returns>
         public async Task<bool> ConnectionInitAsync()
         {
             if (Wiimotes != null)
@@ -63,6 +58,7 @@ namespace IPR.Control.WiiMoteControl
                     return false;
             return true;
         }
+
         public void CloseWiiMotes()
         {
             foreach (WiiMote w in Wiimotes)
@@ -70,19 +66,6 @@ namespace IPR.Control.WiiMoteControl
                 w.Close();  
             }
             Wiimotes = null;
-        }
-        private static void InputEvent(HidDevice sender, HidInputReportReceivedEventArgs args)
-        {
-            System.Diagnostics.Debug.WriteLine("New Input report");
-            IBuffer data = args.Report.Data;
-            
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void OnPropertyChanged(string propertyName)
-        {
-            if (this.PropertyChanged != null)
-                this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

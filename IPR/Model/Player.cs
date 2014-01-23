@@ -7,40 +7,30 @@ using Bing.Maps;
 
 namespace IPR.Model
 {
+    /// <summary>
+    /// Contains player metadata
+    /// This could be expanded with more metadata therefor received its own class.
+    /// </summary>
     public class Player
     {
-        /// <summary>
-        /// The Current name of the player
-        /// </summary>
-        public string Name { get; set; }
 
         /// <summary>
         /// The current location of the player
         /// </summary>
         public Location Location { get; set; }
 
-        /// <summary>
-        /// The Score the player gets by throwing the spear.
-        /// </summary>
-        public double Score { get; set; }
 
         public Player()
         {
-            Name = null;
             Location = null;
-            Score = 0.0;
         }
         public Player(string name)
         {
-            Name = name;
             Location = null;
-            Score = 0.0;
         }
         public Player(string name, Location location, double score)
         {
-            Name = name;
             Location = location;
-            Score = score;
         }
     }
 }

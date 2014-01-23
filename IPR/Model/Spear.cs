@@ -9,10 +9,13 @@ using Windows.UI.Xaml.Controls;
 
 namespace IPR.Model
 {
+    /// <summary>
+    /// Actual spear values. Used to play the game with,
+    /// </summary>
     public class Spear
     {
         /// <summary>
-        /// Checks if the spear is avainable for usage
+        /// Checks if the spear is available for usage
         /// </summary>
         public bool Available { get; set; }
 

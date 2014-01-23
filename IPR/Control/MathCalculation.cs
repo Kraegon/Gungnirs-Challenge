@@ -8,6 +8,10 @@ using Bing.Maps;
 
 namespace IPR.Control
 {
+    /// <summary>
+    /// Extended Math class
+    /// Contains only functions
+    /// </summary>
     class MathCalculation
     {
         public static double CalculateAngle(Location location, Location directionPoint)
@@ -76,9 +80,6 @@ namespace IPR.Control
         /// calculation is the longer you take the less score you have,
         /// if the distance is low, your score will also be
         /// </summary>
-        /// <param name="distance"></param>
-        /// <param name="spawn"></param>
-        /// <returns>int</returns>
         public static int CalculateScore(float distance, TimeSpan spawn)
         {
             int seconds = (int)spawn.TotalSeconds;

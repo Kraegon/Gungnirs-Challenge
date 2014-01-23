@@ -2,7 +2,7 @@
 <Package xmlns="http://schemas.microsoft.com/appx/2010/manifest" xmlns:m2="http://schemas.microsoft.com/appx/2013/manifest">
   <Identity Name="dc898ee5-741c-4ba6-a75c-CatchyTitleIPR" Publisher="CN=Jelle" Version="1.0.0.0" />
   <Properties>
-    <DisplayName>IPR</DisplayName>
+    <DisplayName>Gungnir's Challenge</DisplayName>
     <PublisherDisplayName>Jelle &amp; Julian</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
@@ -15,7 +15,7 @@
   </Resources>
   <Applications>
     <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="IPR.App">
-      <m2:VisualElements DisplayName="IPR" Square150x150Logo="Assets\Logo.png" Square30x30Logo="Assets\SmallLogo.png" Description="IPR" ForegroundText="light" BackgroundColor="#000000">
+      <m2:VisualElements DisplayName="Gungnir's Challenge" Square150x150Logo="Assets\Logo.png" Square30x30Logo="Assets\SmallLogo.png" Description="Spear throwing GPS game." ForegroundText="light" BackgroundColor="#000000">
         <m2:SplashScreen Image="Assets\SplashScreen.png" />
       </m2:VisualElements>
     </Application>
@@ -26,7 +26,7 @@
     <m2:DeviceCapability Name="humaninterfacedevice">
       <!--This is the wiimote-->
       <m2:Device Id="vidpid:057e 0306">
-        <m2:Function Type="usage:0001 0005"/>
+        <m2:Function Type="usage:0001 0005" />
       </m2:Device>
     </m2:DeviceCapability>
   </Capabilities>
