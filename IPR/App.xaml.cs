@@ -109,9 +109,11 @@ namespace IPR
 
         private void OnCommandsRequested(SettingsPane sender, SettingsPaneCommandsRequestedEventArgs args)
         {
-
+            HelpFlyout helpFlyout = new HelpFlyout();
             args.Request.ApplicationCommands.Add(new SettingsCommand(
                 "Reset highscores", "Reset highscores", (handler) => ClearHighscore()));
+            args.Request.ApplicationCommands.Add(new SettingsCommand(
+                "Tutorial", "Help", (handler) => helpFlyout.Show()));
         }
 
         public void ClearHighscore()
