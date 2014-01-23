@@ -53,13 +53,14 @@ namespace IPR.Control
         {
             if (!IsInitialised)
                 await initAsync();
+            if (IsFileEmpty)
+                return new List<HighscoreObj>();
             List<HighscoreObj> unsortedHighscores = objs;
             var sortedVar = from highscore in unsortedHighscores
                             orderby highscore.Distance descending
                             select highscore;
             List<HighscoreObj> sortedList = new List<HighscoreObj>(sortedVar.AsEnumerable<HighscoreObj>());
             return sortedList;
-
         }
     }
 

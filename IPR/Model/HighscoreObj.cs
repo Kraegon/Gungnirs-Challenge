@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,7 +10,7 @@ namespace IPR.Model
     public class HighscoreObj
     {
         public string Name { get; set; }
-        public float Distance { get; set; }
+        public double Distance { get; set; }
         public TimeSpan TimeTaken { get; set; }
 
         public HighscoreObj()

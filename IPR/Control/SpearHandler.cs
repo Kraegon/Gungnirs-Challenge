@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.Devices.Geolocation;
 using Bing.Maps;
-
+using System.Threading;
 namespace IPR.Control
 {
     /// <summary>
@@ -19,13 +19,16 @@ namespace IPR.Control
     /// </summary>
     public class SpearHandler
     {
+        private static Timer scoreTimer;
         private static int throwPower;
 
+        public static HighscoreObj Score = new HighscoreObj();
         public static Spear Gungnir;
+
         public static GameState State = GameState.Idle;
 //        System.Threading.Timer timer = new System.Threading.Timer();
-        public delegate void SpearLocationUpdateHandler();
-        public static event SpearLocationUpdateHandler SpearLocationUpdateEvent;
+        public delegate void PropertieUpdateHandler();
+        public static event PropertieUpdateHandler PropertieUpdateEvent;
 
         public delegate void UpdateGameStateHandler();
         public static event UpdateGameStateHandler UpdateGameStateEvent;
@@ -52,6 +55,7 @@ namespace IPR.Control
                     UpdateGameStateEvent();
                     break;
                 case GameState.SpearThrowing:
+                    Gungnir.Available = false;
                     ThrowSpear(throwPower);
                     break;
                 case GameState.RouteDrawing:
@@ -59,9 +63,30 @@ namespace IPR.Control
                     break;
                 case GameState.Retrieving:
                     RetrieveSpear();
-                    Gungnir.Available = false;
+                    StartTimeRecord();
                     break;
             }
+        }
+
+        public static void PropertyChanged()
+        {
+            PropertieUpdateEvent();
+        }
+
+        public static void StartTimeRecord()
+        {
+            scoreTimer = new Timer(new TimerCallback(timerCallBack), null, 0, 1000);
+        }
+
+        private static void timerCallBack(object e)
+        {
+            Score.TimeTaken = Score.TimeTaken.Add(new TimeSpan(0,0,1));
+            PropertieUpdateEvent();
+        }
+        public static void EndTimeRecord()
+        {
+            scoreTimer.Dispose();
+            PropertieUpdateEvent();
         }
 
         public static void StartThrow()
@@ -70,7 +95,13 @@ namespace IPR.Control
                 UpdateGameStateEvent += SpearHandler_UpdateGameStateEvent;
             UpdateGameStateEvent();
         }
-
+        public static void EndThrow()
+        {
+            if (State == GameState.Retrieving)
+                State = GameState.Idle;
+            Gungnir.Available = true;
+            PropertieUpdateEvent();
+        }
         private static void SpearHandler_UpdateGameStateEvent()
         {
             State += 1;
@@ -83,7 +114,7 @@ namespace IPR.Control
             return retVal;
         }
 
-        public static async void ThrowSpear(int power)
+        private static async void ThrowSpear(int power)
         {
             int Pow = MathCalculation.CalculateDistance(power);
             if (SatanController.DirectionLocation == null || Gungnir == null)
@@ -107,7 +138,7 @@ namespace IPR.Control
                         (a * (SatanController.CurrentPlayer.Location.Latitude + x)) + b
                     );
                     await Task.Delay(200);
-                    SpearLocationUpdateEvent();
+                    PropertieUpdateEvent();
                 }
             }
             else
@@ -119,22 +150,24 @@ namespace IPR.Control
                         (a * (SatanController.CurrentPlayer.Location.Latitude + x)) + b
                     );
                     await Task.Delay(200);
-                    SpearLocationUpdateEvent();
+                    PropertieUpdateEvent();
                 }
             }
             return;
         }
 
-        public static void DrawRoute()
+        private static void DrawRoute()
         {
             //Relay the command to draw the route to Gungnir
             SatanController.HandleMap.DrawWalkableRouteToSpear(SatanController.CurrentPlayer.Location, Gungnir.Location);
+            System.Diagnostics.Debug.WriteLine(String.Empty + Gungnir.Location.Latitude + Gungnir.Location.Longitude);
             UpdateGameStateEvent();
         }
 
-        public static void RetrieveSpear()
+        private static void RetrieveSpear()
         {
-            UpdateGameStateEvent();
+            //set geofence
+            SatanController.HandleMap.AddGeofence(Gungnir.Location);
         }
     }
     /// <summary>
