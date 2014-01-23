@@ -20,6 +20,7 @@ namespace IPR.Control
     public class SpearHandler
     {
         private static int throwPower;
+        public static double Distance;
 
         public static Spear Gungnir;
         public static GameState State = GameState.Idle;

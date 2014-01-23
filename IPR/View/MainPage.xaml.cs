@@ -29,6 +29,8 @@ namespace IPR
 
         public List<HighscoreObj> DisplayedHighscores { get; set; }
 
+        public HelpFlyout HelpFlyout;
+
         public NavigationHelper NavigationHelper
         {
             get { return this.navigationHelper; }
@@ -48,6 +50,8 @@ namespace IPR
             HighscoreReader.HighscoreUpdatedEvent += HighscoreReader_HighscoreUpdatedEvent;
             /* initializes SpearHandler */
             SpearHandler.SpearLocationUpdateEvent += SpearHandler_SpearLocationUpdateEvent;
+
+            HelpFlyout.Show();
 
         }
 
@@ -75,7 +79,7 @@ namespace IPR
             {
                 DrawElements();
                 if ((SpearHandler.Gungnir != null) && !SpearHandler.Gungnir.Available)
-                    YourDistanceBlock.Text = String.Empty + 10.0; //TODO: Turn into distance thrown.
+                    YourDistanceBlock.Text = SpearHandler.Distance.ToString(); //TODO: Turn into distance thrown.
                 if (SpearHandler.State == GameState.Retrieving)
                     YourTimeBlock.Text = TimeSpan.Parse("10:00").ToString(); //TODO: Turn into time taken so far.
                 if ((SpearHandler.Gungnir == null) || SpearHandler.Gungnir.Available)

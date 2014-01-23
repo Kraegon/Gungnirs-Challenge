@@ -14,7 +14,7 @@ namespace IPR.Control
         public static Player CurrentPlayer { get; set; }
         public static Location DirectionLocation { get; set; }
         private static MapHandler handleMap;
-
+        
 
         public static MapHandler HandleMap
         {

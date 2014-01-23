@@ -33,7 +33,6 @@ namespace IPR.Control
         public Geolocator Locator;
 
 
-
         public void Initialize()
         {
             Locator = new Geolocator();
@@ -121,10 +120,13 @@ namespace IPR.Control
             DirManager.RequestOptions.RouteMode = RouteModeOption.Walking;
             DirManager.RequestOptions.Optimize = OptimizeOption.Walking;
             
-            //Do something with the distance?
-            var distance = DirManager.RequestOptions.DistanceUnit;
-            
+            //Do something with the distance
+
             RouteResponse response = await DirManager.CalculateDirectionsAsync();
+            SpearHandler.Distance = response.Routes[0].TravelDistance * 1000;
+
+            DirManager.RenderOptions.WaypointPushpinOptions.Visible = false;
+
             if (response.HasError)
                 await SatanController.ShowMessageAsync("Route error", "The route could not be calculated.");
 
