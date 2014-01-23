@@ -27,9 +27,12 @@ namespace IPR
     {
         private NavigationHelper navigationHelper;
 
-        public List<HighscoreObj> DisplayedHighscores { get; set; }
+
 
         public HelpFlyout HelpFlyout;
+
+
+        public List<HighscoreObj> DisplayedHighscores { get; set; }
 
         public NavigationHelper NavigationHelper
         {
@@ -49,7 +52,7 @@ namespace IPR
             HighscoreInit();
             HighscoreReader.HighscoreUpdatedEvent += HighscoreReader_HighscoreUpdatedEvent;
             /* initializes SpearHandler */
-            SpearHandler.SpearLocationUpdateEvent += SpearHandler_SpearLocationUpdateEvent;
+            SpearHandler.PropertieUpdateEvent += SpearHandler_SpearLocationUpdateEvent;
 
             HelpFlyout.Show();
 
@@ -57,7 +60,7 @@ namespace IPR
 
         void SpearHandler_SpearLocationUpdateEvent()
         {
-            DrawElements();
+            Refresh();
         }
 
         private async void HighscoreReader_HighscoreUpdatedEvent()
@@ -77,11 +80,10 @@ namespace IPR
         {
             await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
-                DrawElements();
                 if ((SpearHandler.Gungnir != null) && !SpearHandler.Gungnir.Available)
-                    YourDistanceBlock.Text = SpearHandler.Distance.ToString(); //TODO: Turn into distance thrown.
+                    YourDistanceBlock.Text = string.Empty + SpearHandler.Score.Distance;
                 if (SpearHandler.State == GameState.Retrieving)
-                    YourTimeBlock.Text = TimeSpan.Parse("10:00").ToString(); //TODO: Turn into time taken so far.
+                    YourTimeBlock.Text = SpearHandler.Score.TimeTaken.ToString(); //TODO: Turn into time taken so far.
                 if ((SpearHandler.Gungnir == null) || SpearHandler.Gungnir.Available)
                 {
                     SpearAvailableBlock.Text = "Available";
@@ -89,15 +91,13 @@ namespace IPR
                 }
                 else
                 {
-
                     SpearAvailableBlock.Text = "Not available";
                     SpearAvailableBlock.Foreground = new SolidColorBrush(Windows.UI.Colors.Red);
                 }
-                //geofence replica
-                if ((SatanController.CurrentPlayer != null && SpearHandler.Gungnir != null) && SpearHandler.Gungnir.Location != null)
-                    AntiGeofencing(SatanController.CurrentPlayer.Location, SpearHandler.Gungnir.Location);
-                //if (Condition for button)
-                SaveButton.IsEnabled = false;
+                if (SpearHandler.State == GameState.Idle && SpearHandler.Score.TimeTaken.TotalSeconds > 0)
+                    SaveButton.IsEnabled = true;
+                else
+                    SaveButton.IsEnabled = false;
                 DrawElements();
             });
         }
@@ -148,7 +148,7 @@ namespace IPR
                 MapLayer.SetPosition(pin, SatanController.DirectionLocation);
             }
             //Spear (if available)
-            if ((SpearHandler.Gungnir != null) && SpearHandler.Gungnir.Location != null)
+            if ((SpearHandler.Gungnir != null) && (!SpearHandler.Gungnir.Available))
             {
                 Pushpin pin = new Pushpin()
                 {
@@ -178,30 +178,15 @@ namespace IPR
 
         private async void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            await HighscoreReader.SaveHighscoreObj(new HighscoreObj(NameTextBox.Text,
-                                                                    float.Parse(YourDistanceBlock.Text),
-                                                                    TimeSpan.Parse(YourTimeBlock.Text)));
-        }
-
-        /// <summary>
-        /// Fucking square collision check insted of geofences, because Windows.Devices.Geolocation.Geofencing is horrible!
-        /// </summary>
-        /// <param name="playerLocation"></param>
-        /// <param name="fenceLocation"></param>
-        private async void AntiGeofencing(Location playerLocation, Location fenceLocation)
-        {
-            if ((playerLocation.Latitude < fenceLocation.Latitude + 0.0005 
-                && playerLocation.Latitude > fenceLocation.Latitude - 0.0005 
-                && playerLocation.Longitude < fenceLocation.Longitude + 0.0005 
-                && playerLocation.Longitude > fenceLocation.Longitude - 0.0005) 
-                && !SpearHandler.Gungnir.Available)
+            if (NameTextBox.Text == string.Empty)
             {
-                System.Diagnostics.Debug.WriteLine("Entered the geofence event and state.Entered");
-                await SatanController.ShowMessageAsync("Gungnir", "Has been picked up!");
-                SpearHandler.Gungnir.Available = true;
-
-                //TODO: Remove the pushpin for the spear!
+                await SatanController.ShowMessageAsync("Error", "No valid name entered");
+                return;
             }
+            SpearHandler.Score.Name = NameTextBox.Text;
+            await HighscoreReader.SaveHighscoreObj(SpearHandler.Score);
+            SpearHandler.Score = new HighscoreObj();
+            SpearHandler.PropertyChanged();
         }
     }
 }

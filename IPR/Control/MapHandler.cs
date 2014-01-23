@@ -39,7 +39,6 @@ namespace IPR.Control
             WaypointCol = new WaypointCollection();
             Locator.DesiredAccuracy = PositionAccuracy.High;
             Locator.PositionChanged += Locator_PositionChanged;
-
             ClearGeofences();
             GeofenceMonitor.Current.GeofenceStateChanged += Current_GeofenceStateChanged;
         }
@@ -48,7 +47,7 @@ namespace IPR.Control
         {
             System.Diagnostics.Debug.WriteLine("Entered geofence");
             var reports = sender.ReadReports();         
-            await MainPage.dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            await MainPage.dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
                 {
                     foreach (var item in reports)
                     {
@@ -56,8 +55,10 @@ namespace IPR.Control
 
                         if (state == GeofenceState.Entered)
                         {
-                            System.Diagnostics.Debug.WriteLine("Entered the geofence event and state.Entered");
-                            SpearHandler.Gungnir.Available = true;
+                            SpearHandler.EndTimeRecord();
+                            await SatanController.ShowMessageAsync("Gungnir", "You have retrieved Gungnir!");
+                            ClearRoute();
+                            SpearHandler.EndThrow();
                         }
                     }
                 });
@@ -123,15 +124,25 @@ namespace IPR.Control
             //Do something with the distance
 
             RouteResponse response = await DirManager.CalculateDirectionsAsync();
-            SpearHandler.Distance = response.Routes[0].TravelDistance * 1000;
-
+            
+           // not sure if merge conflict or not
             DirManager.RenderOptions.WaypointPushpinOptions.Visible = false;
+
+
+            SpearHandler.Score.Distance = response.Routes[0].TravelDistance * 1000;
+            SpearHandler.PropertyChanged(); //Manual fuck you to binding.
 
             if (response.HasError)
                 await SatanController.ShowMessageAsync("Route error", "The route could not be calculated.");
-
             DirManager.ShowRoutePath(DirManager.ActiveRoute);
-        } 
+        }
+
+        private void ClearRoute()
+        {
+            DirManager.RenderOptions.WaypointPushpinOptions.Visible = false;
+            DirManager.HideRoutePath(DirManager.ActiveRoute);
+            DirManager.ClearActiveRoute();
+        }
 
         public static void DrawThrownRoute()
         {
@@ -167,15 +178,16 @@ namespace IPR.Control
         /// Adds a Geofence to the location of the spear
         /// </summary>
         /// <param name="spearLocation"></param>
-        private void AddGeofence(Location spearLocation)
+        public void AddGeofence(Location spearLocation)
         {
-            // Especially for Julian FLOAT!
             Geofence spearFence = new Geofence(
                 "SpearLocation" + DateTime.Now.ToString(),
                 new Geocircle(new BasicGeoposition { Latitude = spearLocation.Latitude, Longitude = spearLocation.Longitude }, (double)30.0f),
                 MonitoredGeofenceStates.Entered,
                 true,
-                TimeSpan.FromSeconds(2)); 
+                TimeSpan.FromSeconds(2));
+            ClearRoute();
+            GeofenceMonitor.Current.Geofences.Add(spearFence);
         }
 
         public void ClearMap()
@@ -203,7 +215,7 @@ namespace IPR.Control
 
             SatanController.DirectionLocation = loc;
             
-            if(SpearHandler.State == GameState.Idle)
+            if((SpearHandler.State == GameState.Idle) && (SatanController.CurrentPlayer != null))
                 SpearHandler.StartThrow();
 
         }
