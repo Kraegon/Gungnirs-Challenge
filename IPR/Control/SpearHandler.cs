@@ -34,7 +34,7 @@ namespace IPR.Control
         /// This is the games procedure.
         /// </summary>
         /// <returns> Success </returns>
-        public async static void ExecuteStateOperation()
+        public static void ExecuteStateOperation()
         {
             if (Gungnir == null)
             {
@@ -79,7 +79,7 @@ namespace IPR.Control
 
         public static int DeterminePower()
         {
-            int retVal = 100;
+            int retVal = 50;
             return retVal;
         }
 

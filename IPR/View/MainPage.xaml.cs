@@ -179,6 +179,11 @@ namespace IPR
                                                                     TimeSpan.Parse(YourTimeBlock.Text)));
         }
 
+        /// <summary>
+        /// Fucking square collision check insted of geofences, because Windows.Devices.Geolocation.Geofencing is horrible!
+        /// </summary>
+        /// <param name="playerLocation"></param>
+        /// <param name="fenceLocation"></param>
         private async void AntiGeofencing(Location playerLocation, Location fenceLocation)
         {
             if ((playerLocation.Latitude < fenceLocation.Latitude + 0.0005 

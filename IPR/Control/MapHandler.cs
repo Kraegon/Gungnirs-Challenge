@@ -110,8 +110,6 @@ namespace IPR.Control
         /// </summary>
         public async void DrawWalkableRouteToSpear(Location playerLocation, Location spearLocation)
         {
-            if (SpearHandler.Gungnir.Available)
-                return;
             if (DirManager == null)
                 DirManager = Map.DirectionsManager;
             DirManager.Waypoints.Clear();

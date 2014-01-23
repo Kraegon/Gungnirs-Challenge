@@ -118,7 +118,7 @@
     <Compile Include="Common\ObservableDictionary.cs" />
     <Compile Include="Common\RelayCommand.cs" />
     <Compile Include="Common\SuspensionManager.cs" />
-    <Compile Include="Control\GodController.cs" />
+    <Compile Include="Control\SatanController.cs" />
     <Compile Include="Control\HighscoreReader.cs" />
     <Compile Include="Control\MapHandler.cs" />
     <Compile Include="Control\MathCalculation.cs" />
