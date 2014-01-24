@@ -120,7 +120,7 @@ namespace IPR.Control
 
 
             SpearHandler.Score.Distance = response.Routes[0].TravelDistance * 1000;
-            SpearHandler.PropertyChanged(); //Manual fuck you to binding.
+            SpearHandler.PropertyChanged(); //Manual f*** you to binding.
 
             if (response.HasError)
                 await SatanController.ShowMessageAsync("Route error", "The route could not be calculated.");

@@ -181,7 +181,7 @@ namespace IPR.Control
         {
             //Relay the command to draw the route to Gungnir
             SatanController.HandleMap.DrawWalkableRouteToSpear(SatanController.CurrentPlayer.Location, Gungnir.Location);
-            System.Diagnostics.Debug.WriteLine(String.Empty + Gungnir.Location.Latitude + Gungnir.Location.Longitude);
+            System.Diagnostics.Debug.WriteLine(String.Empty + "Land location = Lat: "+ Gungnir.Location.Latitude + " Long: " + Gungnir.Location.Longitude);
             UpdateGameStateEvent();
         }
 

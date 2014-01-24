@@ -17,6 +17,10 @@
     <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="IPR.App">
       <m2:VisualElements DisplayName="Gungnir's Challenge" Square150x150Logo="Assets\Logo.png" Square30x30Logo="Assets\SmallLogo.png" Description="Spear throwing GPS game." ForegroundText="light" BackgroundColor="#000000">
         <m2:SplashScreen Image="Assets\SplashScreen.png" />
+        <m2:InitialRotationPreference>
+          <m2:Rotation Preference="landscape" />
+          <m2:Rotation Preference="landscapeFlipped" />
+        </m2:InitialRotationPreference>
       </m2:VisualElements>
     </Application>
   </Applications>

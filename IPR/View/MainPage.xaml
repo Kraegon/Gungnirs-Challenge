@@ -21,6 +21,7 @@
                 <StackPanel Orientation="Horizontal" Grid.Row="1">
                     <TextBlock Text="Distance: " HorizontalAlignment="Left" Margin="5,5,5,5" />
                     <TextBlock x:Name="DistanceBlock" HorizontalAlignment="Right" Text="{Binding Distance}" Margin="5,5,5,5"/>
+                    <TextBlock x:Name="unit" HorizontalAlignment="Right" Text="m" Margin="0,5,5,0"/>
                     <TextBlock Text="Time: " HorizontalAlignment="Left" Margin="5,5,5,5" />
                     <TextBlock x:Name="TimeBlock" HorizontalAlignment="Right" Text="{Binding TimeTaken}" Margin="5,5,5,5" />
                 </StackPanel>
@@ -54,7 +55,7 @@
                     <TextBox x:Name="NameTextBox" Margin="10,10,10,0" />
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="Your distance: " Margin="10,10,0,0" FontSize="21"/>
-                        <TextBlock x:Name="YourDistanceBlock" Text="0.0" Margin="10,10,0,0" FontSize="21"/>
+                        <TextBlock x:Name="YourDistanceBlock" Text="0.0m" Margin="10,10,0,0" FontSize="21"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="Your time taken: " Margin="10,10,0,0" FontSize="21"/>

@@ -97,7 +97,7 @@ namespace IPR
             await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
                 if ((SpearHandler.Gungnir != null) && !SpearHandler.Gungnir.Available)
-                    YourDistanceBlock.Text = string.Empty + SpearHandler.Score.Distance;
+                    YourDistanceBlock.Text = string.Empty + SpearHandler.Score.Distance + "m";
                 if (SpearHandler.State == GameState.Retrieving)
                     YourTimeBlock.Text = SpearHandler.Score.TimeTaken.ToString(); //TODO: Turn into time taken so far.
                 if ((SpearHandler.Gungnir == null) || SpearHandler.Gungnir.Available)
@@ -150,6 +150,7 @@ namespace IPR
                 BingMap.Children.Add(pin);
                 MapLayer.SetPosition(pin, SatanController.CurrentPlayer.Location);
                 //Set view
+                if (SpearHandler.State == GameState.Idle)
                 if (BingMap.ZoomLevel < 15.0f)
                     BingMap.SetView(SatanController.CurrentPlayer.Location, 15.0f);
                 else
@@ -218,6 +219,7 @@ namespace IPR
             SatanController.DirectionLocation = null;
             try
             {
+                SpearHandler.Gungnir.Location = null;
                 SpearHandler.Gungnir.Available = true;
             }
             catch (NullReferenceException)
